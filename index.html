@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hydratonics — Precision Electrolyte Supplement</title>
+
+  <!--
+  ╔══════════════════════════════════════════════════════════════╗
+  ║  FONT SETUP                                                  ║
+  ║                                                              ║
+  ║  Self-hosted fonts go in a /fonts folder next to index.html  ║
+  ║  Uncomment the @font-face block in the CSS to activate.      ║
+  ║                                                              ║
+  ║  Avenir Ultra Bold:                                          ║
+  ║    /fonts/avenir-ultra-bold.woff2                            ║
+  ║    /fonts/avenir-ultra-bold.woff                             ║
+  ║                                                              ║
+  ║  Garvis Pro: NOT needed. Brand name SVG is fully outlined    ║
+  ║  paths and renders correctly in all browsers without any     ║
+  ║  font files.                                                 ║
+  ╚══════════════════════════════════════════════════════════════╝
+  -->
+
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=STIX+Two+Text:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet" />
+
+  <style>
+
+    /* ── SELF-HOSTED FONTS (uncomment when files are in /fonts/) ─
+
+    @font-face {
+      font-family: 'Avenir';
+      font-weight: 900;
+      font-style: normal;
+      font-display: swap;
+      src: url('fonts/avenir-ultra-bold.woff2') format('woff2'),
+           url('fonts/avenir-ultra-bold.woff')  format('woff');
+    }
+
+    ─────────────────────────────────────────────────────────── */
+
+    /* ── TOKENS ─────────────────────────────────────────── */
+    :root {
+      --white:       #ffffff;
+      --off-white:   #f7f6f4;
+      --ink:         #1a1a1a;
+      --grey-dark:   #555555;
+      --grey-mid:    #888888;
+      --grey-light:  #cccccc;
+      --rule:        #e0e0e0;
+
+      --t1-blue:     rgba(91,  148, 249, 1);
+      --t2-amber:    rgba(255, 165, 52,  1);
+      --t3-red:      rgba(211, 95,  95,  1);
+
+      --font-display: 'Avenir', 'Avenir Next', 'Century Gothic', 'Trebuchet MS', sans-serif;
+      --font-body:    'STIX Two Text', Georgia, serif;
+      --font-mono:    'DM Mono', 'Courier New', monospace;
+      --font-display-weight: 900;
+
+      --max-w:       760px;
+      --section-gap: 80px;
+    }
+
+    /* ── RESET ──────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--white);
+      color: var(--ink);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    /* ── LAYOUT ─────────────────────────────────────────── */
+    .container {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ── BRAND SVG ──────────────────────────────────────── */
+    /*
+      The inline SVG uses font-family 'Garvis Pro Test'.
+      Add the @font-face block above with that exact family name
+      and the SVG will render in Garvis Pro automatically.
+      Until then it falls back to the browser's default serif.
+
+      To control size: adjust the height on .brand-svg.
+      The SVG viewBox is wide (49mm x 8.5mm ratio), so width
+      scales automatically from height via the SVG aspect ratio.
+    */
+    .brand-svg {
+      height: 18px;
+      width: auto;
+      display: block;
+      overflow: visible;
+    }
+    .brand-svg text, .brand-svg tspan {
+      fill: var(--ink);
+    }
+    footer .brand-svg text, footer .brand-svg tspan {
+      fill: var(--ink);
+    }
+
+    /* ── NAV ────────────────────────────────────────────── */
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--rule);
+      position: sticky;
+      top: 0;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+    }
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--grey-dark);
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--ink); }
+
+    /* ── HERO ───────────────────────────────────────────── */
+    .hero {
+      padding: 72px 0 64px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .hero-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--grey-mid);
+      margin-bottom: 20px;
+    }
+    .hero-headline {
+      font-family: var(--font-display);
+      font-weight: var(--font-display-weight);
+      /*
+        Font size is tied to container width so line breaks stay fixed.
+        Container max = 760px, padding = 2×24px → usable = 712px.
+        At 712px wide, the longest line ("You lose electrolytes when")
+        fills the width at ~43px. Below 760px viewport it scales with vw.
+        min() caps it so it never exceeds the designed size.
+      */
+      font-size: min(6.05vw, 43px);
+      line-height: 1;
+      letter-spacing: -0.02em;
+      margin-bottom: 24px;
+      /* no max-width — lines are controlled by white-space below */
+    }
+    .hero-headline em {
+      font-style: normal;
+      color: var(--t1-blue);
+    }
+    .headline-line {
+      display: block;
+      white-space: nowrap;  /* each line is explicitly set, never reflowed */
+    }
+    .headline-line + .headline-line {
+      margin-top: 0.22em;
+    }
+    /* On very small screens, allow wrapping and fall back to normal flow */
+    @media (max-width: 420px) {
+      .hero-headline { font-size: 8vw; }
+      .headline-line { white-space: normal; }
+    }
+    .hero-sub {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--grey-dark);
+      margin-bottom: 32px;
+    }
+    .hero-body {
+      font-family: var(--font-body);
+      font-size: 17px;
+      color: var(--grey-dark);
+      max-width: 520px;
+      line-height: 1.75;
+      margin-bottom: 40px;
+    }
+    .hero-cta {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink);
+      border: 1px solid var(--ink);
+      padding: 12px 24px;
+      transition: background 0.2s, color 0.2s;
+    }
+    .hero-cta:hover { background: var(--ink); color: var(--white); }
+
+    /* ── SECTION HEADERS ────────────────────────────────── */
+    .section {
+      padding: var(--section-gap) 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--grey-mid);
+      margin-bottom: 28px;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-weight: var(--font-display-weight);
+      font-size: 24px;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+      line-height: 1.2;
+    }
+    .section-body {
+      font-family: var(--font-body);
+      font-size: 16px;
+      color: var(--grey-dark);
+      line-height: 1.8;
+      max-width: 580px;
+    }
+    .section-body p + p { margin-top: 16px; }
+    .section-body em { font-style: italic; }
+    .section-body strong {
+      font-weight: 700;
+      color: var(--ink);
+      font-family: var(--font-display);
+    }
+
+    /* ── TIERS ──────────────────────────────────────────── */
+    .tiers-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--rule);
+      border: 1px solid var(--rule);
+      margin-top: 40px;
+    }
+    .tier-card { background: var(--white); padding: 28px 24px; }
+    .tier-pill {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      margin-bottom: 20px;
+      color: var(--white);
+    }
+    .tier-card.t1 .tier-pill  { background: var(--t1-blue); }
+    .tier-card.t2 .tier-pill  { background: var(--t2-amber); }
+    .tier-card.t3 .tier-pill  { background: var(--t3-red); }
+
+    .tier-na-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--grey-mid);
+      margin-bottom: 4px;
+    }
+    .tier-na-value {
+      font-family: var(--font-display);
+      font-weight: var(--font-display-weight);
+      font-size: 36px;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 2px;
+    }
+    .tier-na-unit { font-size: 14px; font-weight: 400; color: var(--grey-dark); }
+    .tier-card.t1 .tier-na-value { color: var(--t1-blue); }
+    .tier-card.t2 .tier-na-value { color: var(--t2-amber); }
+    .tier-card.t3 .tier-na-value { color: var(--t3-red); }
+
+    .tier-appline {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      line-height: 1.7;
+      margin-top: 16px;
+    }
+    .tier-card.t1 .tier-appline { color: var(--t1-blue); }
+    .tier-card.t2 .tier-appline { color: var(--t2-amber); }
+    .tier-card.t3 .tier-appline { color: var(--t3-red); }
+
+    .tier-vol {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--grey-mid);
+      margin-top: 12px;
+      letter-spacing: 0.04em;
+    }
+
+    /* ── CALLOUT ────────────────────────────────────────── */
+    .callout {
+      border-left: 3px solid var(--t1-blue);
+      padding: 20px 24px;
+      background: var(--off-white);
+      margin: 28px 0;
+    }
+    .callout-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--t1-blue);
+      margin-bottom: 8px;
+    }
+    .callout-text {
+      font-family: var(--font-body);
+      font-size: 15px;
+      color: var(--grey-dark);
+      line-height: 1.75;
+    }
+
+    /* ── INGREDIENT TABLE ───────────────────────────────── */
+    .ingredient-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 32px;
+    }
+    .ingredient-table th {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--grey-mid);
+      text-align: left;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .ingredient-table td {
+      padding: 14px;
+      border-bottom: 1px solid var(--rule);
+      vertical-align: top;
+    }
+    .ingredient-table tr:last-child td { border-bottom: none; }
+    .ing-name {
+      font-family: var(--font-display);
+      font-weight: var(--font-display-weight);
+      font-size: 13px;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+    .ing-amount {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--t1-blue);
+      white-space: nowrap;
+    }
+    .ing-why {
+      font-family: var(--font-body);
+      color: var(--grey-dark);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    /* ── MISSION ────────────────────────────────────────── */
+    .mission-section {
+      padding: var(--section-gap) 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    .mission-headline {
+      font-family: var(--font-display);
+      font-weight: var(--font-display-weight);
+      font-size: 22px;
+      letter-spacing: -0.02em;
+      max-width: 480px;
+      line-height: 1.3;
+      margin-bottom: 16px;
+    }
+    .mission-body {
+      font-family: var(--font-body);
+      font-size: 16px;
+      color: var(--grey-dark);
+      max-width: 520px;
+      line-height: 1.8;
+    }
+
+    /* ── EMAIL SIGNUP ───────────────────────────────────── */
+    .signup-section {
+      padding: var(--section-gap) 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    .signup-title {
+      font-family: var(--font-display);
+      font-weight: var(--font-display-weight);
+      font-size: 22px;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+    .signup-sub {
+      font-family: var(--font-body);
+      font-size: 15px;
+      color: var(--grey-dark);
+      margin-bottom: 28px;
+    }
+    .signup-form { display: flex; max-width: 440px; }
+    .signup-form input[type="email"] {
+      flex: 1;
+      border: 1px solid var(--ink);
+      border-right: none;
+      padding: 12px 16px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      outline: none;
+      background: var(--white);
+      color: var(--ink);
+      border-radius: 0;
+      -webkit-appearance: none;
+    }
+    .signup-form input[type="email"]::placeholder { color: var(--grey-mid); }
+    .signup-form input[type="email"]:focus { border-color: var(--t1-blue); }
+    .signup-form button {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: var(--ink);
+      color: var(--white);
+      border: 1px solid var(--ink);
+      padding: 12px 20px;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .signup-form button:hover { background: var(--t1-blue); border-color: var(--t1-blue); }
+    .signup-confirm {
+      display: none;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      color: var(--t1-blue);
+      margin-top: 12px;
+      text-transform: uppercase;
+    }
+    .contact-line {
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--grey-mid);
+      margin-top: 20px;
+    }
+    .contact-line a {
+      color: var(--ink);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+    .contact-line a:hover { color: var(--t1-blue); }
+
+    /* ── FOOTER ─────────────────────────────────────────── */
+    footer { padding: 32px 0; }
+    footer .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .footer-links { display: flex; gap: 24px; list-style: none; }
+    .footer-links a {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--grey-mid);
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--ink); }
+
+    /* ── RESPONSIVE ─────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .tiers-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      .signup-form { flex-direction: column; }
+      .signup-form input[type="email"] { border-right: 1px solid var(--ink); border-bottom: none; }
+      .signup-form button { width: 100%; }
+      .ing-name, .ing-amount { white-space: normal; }
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="container">
+      <!-- BRAND NAME SVG (fully outlined paths, no font needed) -->
+      <svg class="brand-svg" viewBox="0 0 49.381504 8.4851494" xmlns="http://www.w3.org/2000/svg" aria-label="Hydratonics" role="img">
+        <g transform="translate(-44.419653,-85.017826)">
+          <path style="fill:#1a1a1a;" d="m 49.730112,91.533361 c 0.307492,0 1.454353,0.0166 1.55408,0.0166 -0.03324,-0.11635 -0.06648,-0.3158 -0.08311,-0.42384 -0.216076,-0.0249 -0.69809,-0.16621 -0.83937,-0.29087 -0.0083,-0.27425 -0.01662,-0.3158 -0.01662,-0.68147 v -2.83391 c 0,-0.30749 0.0083,-0.764571 0.01662,-0.955721 0.14128,-0.124655 0.606673,-0.241003 0.822748,-0.265935 0.0083,-0.08311 0.04986,-0.307492 0.08311,-0.398909 -0.08311,0 -1.188414,0.01662 -1.520838,0.01662 -0.349044,0 -1.446042,-0.01662 -1.537459,-0.01662 0.04155,0.116349 0.05817,0.290871 0.08311,0.398909 0.216075,0.02493 0.614984,0.14128 0.756264,0.265935 0,0.19115 0.01662,0.498641 0.01662,0.930791 0,0.24101 0,0.62329 -0.01662,0.81444 -0.191144,0.008 -1.030513,0.0166 -1.313073,0.0166 -0.448772,0 -0.922476,-0.008 -1.072066,-0.0166 -0.01662,-0.19115 -0.01662,-0.52357 -0.01662,-0.79782 0,-0.30749 0.0083,-0.756261 0.01662,-0.947411 0.14128,-0.124655 0.540188,-0.241003 0.756263,-0.265935 0.01662,-0.08311 0.04155,-0.28256 0.08311,-0.398909 -0.08311,0 -1.238278,0.01662 -1.537459,0.01662 -0.307492,0 -1.429421,-0.01662 -1.529149,-0.01662 0.04155,0.108038 0.0748,0.307492 0.08311,0.398909 0.216076,0.02493 0.689779,0.14128 0.831059,0.265935 0.0083,0.27425 0.01662,0.606681 0.01662,0.972341 v 2.81729 c 0,0.30749 -0.0083,0.49033 -0.01662,0.68147 -0.14128,0.12466 -0.631604,0.26594 -0.84768,0.29087 -0.01662,0.10804 -0.04986,0.30749 -0.08311,0.42384 0.08311,0 1.229968,-0.0166 1.529149,-0.0166 0.307492,0 1.462664,0.0166 1.562391,0.0166 -0.03324,-0.11635 -0.06649,-0.3158 -0.08311,-0.42384 -0.216076,-0.0249 -0.623294,-0.16621 -0.764574,-0.29087 -0.0083,-0.17452 -0.01662,-0.37398 -0.01662,-0.68978 v -0.77288 c 0,-0.34074 0,-0.59837 0.01662,-0.75627 0.14128,-0.008 0.631604,-0.0166 1.072066,-0.0166 0.307491,0 1.113619,0.008 1.313073,0.0166 0.0083,0.14959 0.01662,0.53188 0.01662,0.78951 v 0.74795 c 0,0.30749 -0.0083,0.49033 -0.01662,0.68147 -0.14128,0.12466 -0.540189,0.26594 -0.756264,0.29087 -0.01662,0.10804 -0.04986,0.30749 -0.08311,0.42384 0.08311,0 1.221657,-0.0166 1.520839,-0.0166 z m 1.88651,-3.54862 c 0.207765,0.0415 0.398908,0.13297 0.540188,0.2327 0.515257,0.98896 1.171793,2.41007 1.620565,3.43227 -0.14128,0.40722 -0.265939,0.7064 -0.482014,1.15517 h -0.04986 c -0.0083,-0.34904 -0.224385,-0.55681 -0.548498,-0.55681 -0.282561,0 -0.573431,0.24101 -0.573431,0.60667 0,0.35736 0.324113,0.64823 0.806127,0.64823 0.515257,0 0.914165,-0.41553 1.138551,-1.01389 0.07479,-0.19115 0.191143,-0.49033 0.407219,-1.03883 0.457082,-1.16348 0.880922,-2.17737 1.346315,-3.19126 0.191144,-0.12466 0.373977,-0.21608 0.598363,-0.27425 0.0083,-0.10804 0.03324,-0.28256 0.05817,-0.37398 -0.08311,0 -0.739643,0.0166 -1.038824,0.0166 -0.307492,0 -0.806127,-0.0166 -0.905854,-0.0166 0.02493,0.0914 0.04986,0.26594 0.05817,0.37398 0.216075,0.0582 0.398908,0.14959 0.556809,0.24932 -0.166211,0.57343 -0.457082,1.35462 -0.756263,2.06933 h -0.03324 c -0.332423,-0.71471 -0.631604,-1.44604 -0.85599,-2.09427 0.124659,-0.0831 0.315802,-0.17452 0.490325,-0.22438 0.0083,-0.10804 0.03324,-0.28256 0.05817,-0.37398 -0.08311,0 -0.988961,0.0166 -1.288142,0.0166 -0.307492,0 -1.105308,-0.0166 -1.205035,-0.0166 0.02493,0.0914 0.04986,0.26594 0.05817,0.37398 z m 5.202424,1.78678 c 0,1.08868 0.781195,1.86988 1.770155,1.86988 0.365666,0 0.897544,-0.55681 1.146862,-0.71471 l 0.03324,0.0249 c 0,0.21607 -0.01662,0.37398 -0.04155,0.58174 l 0.149591,0.12466 c 0.440461,-0.0332 1.304762,-0.17452 1.670428,-0.20777 -0.02493,-0.0997 -0.04155,-0.28256 -0.04986,-0.38228 -0.191144,-0.0332 -0.490325,-0.14128 -0.590052,-0.20777 -0.0083,-0.14128 -0.01662,-0.41553 -0.01662,-0.62329 v -4.138676 c 0,-0.382287 0.02493,-0.731332 0.04155,-0.955718 l -0.14128,-0.124659 c -0.473704,0.0748 -1.470975,0.307492 -1.803398,0.349045 0.03324,0.09142 0.06648,0.28256 0.06648,0.382287 0.166212,0.03324 0.448772,0.124659 0.606673,0.207765 0.0083,0.132969 0.01662,0.315802 0.01662,0.590055 v 0.390591 c 0,0.19115 0,0.41553 0.01662,0.66485 -0.108038,-0.008 -0.332424,-0.0831 -0.581741,-0.0831 -1.205036,0 -2.293723,1.0222 -2.293723,2.25217 z m 1.254899,-0.34074 c 0,-0.96403 0.440461,-1.42942 0.972339,-1.42942 0.448772,0 0.673158,0.36567 0.689779,0.88923 0.0083,0.14128 0.01662,0.3906 0.01662,0.63992 0,0.46539 0,0.84768 -0.01662,1.04713 -0.182833,0.13297 -0.382287,0.26594 -0.723022,0.26594 -0.523567,0 -0.939096,-0.49032 -0.939096,-1.4128 z m 3.664969,2.1192 c 0.08311,0 0.864301,-0.0166 1.163482,-0.0166 0.307492,0 1.637186,0.0166 1.736914,0.0166 -0.02493,-0.0914 -0.04986,-0.26594 -0.05817,-0.37397 -0.216075,-0.0249 -0.747953,-0.14128 -0.889233,-0.2327 -0.0083,-0.2327 -0.01662,-0.46539 -0.01662,-0.83106 v -1.37125 c 0.232697,-0.12466 0.448772,-0.29918 0.723021,-0.32411 0.0748,0.30749 0.324113,0.54019 0.656537,0.54019 0.349045,0 0.639915,-0.28256 0.639915,-0.7064 0,-0.44046 -0.29087,-0.73133 -0.7064,-0.73133 -0.357355,0 -0.930786,0.59005 -1.313073,0.82274 l -0.03324,-0.0249 c 0.0083,-0.25763 0.01662,-0.49032 0.04986,-0.74795 l -0.14959,-0.12466 c -0.473704,0.0748 -1.462664,0.29918 -1.770156,0.34905 0.02493,0.11634 0.05817,0.3158 0.06649,0.38228 0.166212,0.0332 0.465393,0.13297 0.606673,0.20777 0.01662,0.20776 0.01662,0.59836 0.01662,0.81443 v 0.91417 c 0,0.3158 -0.01662,0.7064 -0.01662,0.83106 -0.14128,0.0997 -0.432151,0.20776 -0.648226,0.2327 -0.01662,0.10803 -0.02493,0.28256 -0.05817,0.37397 z m 4.263328,-0.90585 c 0,0.59836 0.473703,1.00558 1.188414,1.00558 0.407219,0 0.764574,-0.40722 1.038824,-0.6233 l 0.01662,0.0249 c 0.06649,0.29918 0.324113,0.55681 0.673158,0.55681 0.498635,0 0.922475,-0.24101 1.171793,-0.52357 -0.05817,-0.0582 -0.13297,-0.16621 -0.174523,-0.25763 -0.06648,0.0499 -0.166211,0.0831 -0.232696,0.0831 -0.199454,0 -0.373977,-0.0665 -0.373977,-0.50695 0,-0.60667 0.0748,-0.97234 0.0748,-1.46266 0,-0.83937 -0.648226,-1.42111 -1.562391,-1.42111 -1.022203,0 -1.711982,0.56512 -1.711982,1.07206 0,0.3906 0.241007,0.57343 0.56512,0.57343 0.257629,0 0.531878,-0.20776 0.531878,-0.4737 0,-0.26594 -0.124659,-0.42384 -0.257628,-0.56512 0.09973,-0.0499 0.274249,-0.0997 0.548499,-0.0997 0.465393,0 0.789506,0.37398 0.789506,0.99727 0,0.0582 -0.0083,0.19946 -0.02493,0.26594 -1.520838,0.0416 -2.26048,0.55681 -2.26048,1.35463 z m 1.229967,-0.14128 c 0,-0.44046 0.332424,-0.82275 0.855991,-0.82275 0.08311,0 0.108037,0.008 0.157901,0.0332 0.0083,0.10804 0.0083,0.20777 0.0083,0.26594 0,0.20776 -0.0083,0.53188 -0.03324,0.67316 -0.207765,0.17452 -0.349045,0.28256 -0.631605,0.28256 -0.207764,0 -0.357355,-0.20777 -0.357355,-0.43215 z m 4.479416,1.15517 c 0.473703,0 1.196724,-0.45708 1.495906,-0.72302 -0.05817,-0.0665 -0.13297,-0.16621 -0.174523,-0.25763 -0.14128,0.0748 -0.498635,0.16621 -0.689779,0.16621 -0.407219,0 -0.473703,-0.34904 -0.473703,-1.03051 v -1.04714 c 0,-0.241 0.0083,-0.48201 0.01662,-0.55681 0.06649,-0.008 0.132969,-0.008 0.199454,-0.008 0.207765,0 0.731332,0.0166 0.922476,0.0416 0.01662,-0.17453 0.06648,-0.49033 0.116348,-0.65654 -0.14128,0.008 -0.731332,0.0416 -1.013892,0.0416 -0.09142,0 -0.182833,0 -0.232697,-0.008 -0.0083,-0.10803 -0.0083,-0.48201 -0.0083,-0.58174 0,-0.17452 0,-0.340731 0.0083,-0.590051 -0.174522,0.0831 -0.614983,0.14959 -0.764574,0.1579 -0.09142,0.216081 -0.224386,0.656541 -0.382287,0.822751 -0.224386,0.19114 -0.482014,0.34073 -0.69809,0.40722 0.03324,0.0914 0.0748,0.27425 0.08311,0.38229 0.05817,-0.008 0.207765,-0.0166 0.28256,-0.0166 0.116349,0 0.182833,0 0.265939,0.008 0.0083,0.0748 0.01662,0.31581 0.01662,0.55681 v 0.65654 c 0,0.28256 -0.0083,0.49864 -0.0083,0.88923 0,0.91417 0.398908,1.34632 1.038824,1.34632 z m 1.736907,-2.02778 c 0,1.12193 0.806127,2.02778 2.11089,2.02778 1.246588,0 2.26048,-0.90585 2.26048,-2.11089 0,-1.16348 -0.864301,-2.02778 -2.127511,-2.02778 -1.26321,0 -2.243859,0.8643 -2.243859,2.11089 z m 1.288141,-0.0831 c 0,-1.03882 0.332424,-1.54577 0.855991,-1.54577 0.55681,0 0.939097,0.5485 0.939097,1.62888 0,1.03051 -0.407219,1.54577 -0.889233,1.54577 -0.598363,0 -0.905855,-0.55681 -0.905855,-1.62888 z m 3.47382,2.00285 c 0.08311,0 1.063755,-0.0166 1.362936,-0.0166 0.307492,0 1.005582,0.0166 1.105309,0.0166 -0.02493,-0.0914 -0.05817,-0.26594 -0.05817,-0.37397 -0.13297,-0.0332 -0.315803,-0.12466 -0.457083,-0.2327 -0.0083,-0.24101 -0.01662,-0.4737 -0.01662,-0.83937 v -1.55408 c 0.257628,-0.13297 0.465393,-0.17452 0.723021,-0.17452 0.390598,0 0.7064,0.27425 0.7064,0.92247 v 0.80613 c 0,0.34904 -0.01662,0.74795 -0.01662,0.83937 -0.14959,0.10804 -0.315802,0.19114 -0.457082,0.2327 -0.0083,0.10803 -0.03324,0.28256 -0.05817,0.37397 0.08311,0 0.864301,-0.0166 1.163482,-0.0166 0.307492,0 1.146862,0.0166 1.246589,0.0166 -0.02493,-0.0914 -0.04986,-0.26594 -0.05817,-0.37397 -0.149591,-0.0249 -0.448772,-0.14128 -0.590052,-0.2327 -0.0083,-0.24101 -0.01662,-0.4737 -0.01662,-0.83937 v -1.17179 c 0,-0.88093 -0.482015,-1.4128 -1.304763,-1.4128 -0.41553,0 -1.047134,0.49032 -1.338005,0.68146 l -0.03324,-0.0249 c 0.0083,-0.21607 0.02493,-0.42384 0.04986,-0.60667 l -0.14959,-0.12466 c -0.473704,0.0748 -1.462664,0.29918 -1.770156,0.34905 0.02493,0.11634 0.05817,0.3158 0.06649,0.38228 0.166211,0.0332 0.448771,0.12466 0.606673,0.20777 0.0083,0.27425 0.01662,0.5485 0.01662,0.76457 v 0.95572 c 0,0.3158 -0.01662,0.71471 -0.01662,0.83937 -0.166212,0.0997 -0.457083,0.19945 -0.648226,0.2327 -0.0083,0.10803 -0.03324,0.28256 -0.05817,0.37397 z m 5.484988,0 c 0.08311,0 1.030513,-0.0166 1.329694,-0.0166 0.307489,0 1.205036,0.0166 1.304756,0.0166 -0.0249,-0.0914 -0.0499,-0.26594 -0.0582,-0.37397 -0.216077,-0.0416 -0.473697,-0.14128 -0.623287,-0.2327 -0.008,-0.2327 -0.0166,-0.46539 -0.0166,-0.83106 v -1.67874 c 0,-0.25763 0.0166,-0.56512 0.0332,-0.85599 l -0.1579,-0.13297 c -0.473708,0.0748 -1.454358,0.30749 -1.778471,0.34905 0.02493,0.10803 0.05817,0.3158 0.06649,0.38228 0.182833,0.0332 0.448772,0.12466 0.606673,0.20777 0.0083,0.27425 0.01662,0.71471 0.01662,0.93078 v 0.78951 c 0,0.34073 -0.01662,0.75626 -0.01662,0.83937 -0.182833,0.0997 -0.432151,0.19114 -0.648226,0.2327 -0.0083,0.10803 -0.03324,0.28256 -0.05817,0.37397 z m 0.506946,-5.559784 c 0,0.373973 0.28256,0.648223 0.681468,0.648223 0.407219,0 0.689779,-0.340731 0.689779,-0.714708 0,-0.373976 -0.25763,-0.648226 -0.689779,-0.648226 -0.407219,0 -0.681468,0.315803 -0.681468,0.714711 z m 2.435004,3.673284 c 0,1.17179 0.80613,1.99454 2.01947,1.99454 0.59006,0 1.23828,-0.44877 1.55409,-0.78951 -0.0582,-0.0499 -0.13297,-0.17452 -0.15791,-0.24931 -0.25762,0.12465 -0.71471,0.241 -1.0222,0.241 -0.65654,0 -1.12193,-0.48201 -1.12193,-1.32138 0,-1.08869 0.42384,-1.53746 0.95572,-1.53746 0.21608,0 0.42384,0.0582 0.51526,0.11635 v 0.0332 c -0.17453,0.0665 -0.32412,0.28256 -0.32412,0.50695 0,0.33242 0.24101,0.53187 0.54019,0.53187 0.33243,0 0.59836,-0.26593 0.59836,-0.68977 0,-0.50695 -0.63991,-0.98065 -1.47928,-0.98065 -1.23828,0 -2.07765,0.87261 -2.07765,2.14413 z m 4.07218,1.67874 c 0.29088,0.16621 0.69809,0.3158 1.31308,0.3158 1.15517,0 1.77846,-0.53188 1.77846,-1.26321 0,-0.63992 -0.26593,-0.98896 -1.24658,-1.34632 -0.67316,-0.24931 -0.76458,-0.44877 -0.76458,-0.68146 0,-0.22439 0.21608,-0.42384 0.45708,-0.42384 0.20777,0 0.32412,0.0249 0.44878,0.0914 0.19114,0.16621 0.40721,0.44046 0.54849,0.76458 0.0914,-0.0249 0.25763,-0.0582 0.34905,-0.0748 -0.0748,-0.30749 -0.11635,-0.78119 -0.11635,-1.03051 -0.19945,-0.10804 -0.72302,-0.21608 -1.0222,-0.21608 -1.07207,0 -1.68705,0.54019 -1.68705,1.27983 0,0.63992 0.36567,1.0139 1.12193,1.29646 0.71471,0.26593 0.83106,0.41553 0.83106,0.69809 0,0.26593 -0.25763,0.44877 -0.57343,0.44877 -0.29087,0 -0.4654,-0.0582 -0.63992,-0.17453 -0.1579,-0.18283 -0.46539,-0.68146 -0.55681,-0.8643 -0.0914,0.0249 -0.30749,0.0831 -0.3906,0.0831 0.0748,0.44046 0.12466,0.61498 0.14959,1.097 z" />
+        </g>
+      </svg>
+      <ul class="nav-links">
+        <li><a href="#tiers">Tiers</a></li>
+        <li><a href="#formula">Formula</a></li>
+        <li><a href="#why">Why It Works</a></li>
+        <li><a href="#signup">Stay Updated</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <p class="hero-eyebrow">Electrolyte Supplement</p>
+      <h1 class="hero-headline">
+        <span class="headline-line">You lose electrolytes when</span>
+        <span class="headline-line">you sweat. This replaces</span>
+        <span class="headline-line">them <em>exactly.</em></span>
+      </h1>
+      <p class="hero-sub">Calibrated to your output. Nothing added. Nothing missing.</p>
+      <p class="hero-body">
+        Most electrolyte products guess at dosing. Every ingredient here has a specific reason to be here, and a specific reason it is dosed the way it is. The formula does not include anything that is not working.
+      </p>
+      <a href="#tiers" class="hero-cta">See the three tiers</a>
+    </div>
+  </section>
+
+  <!-- TIERS -->
+  <section class="section" id="tiers">
+    <div class="container">
+      <p class="section-label">Three Tiers</p>
+      <h2 class="section-title">Sweat loss is not the same at every intensity.</h2>
+      <p class="section-body">
+        A single formula cannot serve a 45-minute strength session and a three-hour marathon. The electrolyte demand is fundamentally different. Each tier is calibrated to a specific output level, not to a marketing narrative.
+      </p>
+      <div class="tiers-grid">
+        <div class="tier-card t1">
+          <div class="tier-pill">I &nbsp;Low Demand</div>
+          <p class="tier-na-label">Elemental Sodium</p>
+          <p class="tier-na-value">400<span class="tier-na-unit">mg</span></p>
+          <p class="tier-appline">Strength Training<br>Zone 2 • Hot Days<br>Physical Work Shifts</p>
+          <p class="tier-vol">Min. 600 mL water</p>
+        </div>
+        <div class="tier-card t2">
+          <div class="tier-pill">II &nbsp;Moderate</div>
+          <p class="tier-na-label">Elemental Sodium</p>
+          <p class="tier-na-value">700<span class="tier-na-unit">mg</span></p>
+          <p class="tier-appline">Intervals<br>Team Practice<br>Long Lifts • Hard Sessions</p>
+          <p class="tier-vol">Min. 1,100 mL water</p>
+        </div>
+        <div class="tier-card t3">
+          <div class="tier-pill">III &nbsp;High Demand</div>
+          <p class="tier-na-label">Elemental Sodium</p>
+          <p class="tier-na-value">1,000<span class="tier-na-unit">mg</span></p>
+          <p class="tier-appline">Marathons<br>Endurance Cycling<br>Extreme Heat • Competition</p>
+          <p class="tier-vol">Min. 1,500 mL water</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FORMULA -->
+  <section class="section" id="formula">
+    <div class="container">
+      <p class="section-label">The Formula — Tier I</p>
+      <h2 class="section-title">Every ingredient has a job. Nothing else is here.</h2>
+      <p class="section-body">
+        Sodium is the anchor. Everything else exists in relation to it, calculated from sweat research, not chosen for a label. Here is exactly what is in Tier I and why.
+      </p>
+      <table class="ingredient-table">
+        <thead>
+          <tr>
+            <th>Ingredient</th>
+            <th>Amount</th>
+            <th>Why it's here</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="ing-name">Sodium Chloride</td>
+            <td class="ing-amount">1,017 mg</td>
+            <td class="ing-why">Primary sweat electrolyte. 400 mg elemental sodium, validated against ACSM sweat research. Pre-exercise sodium improves fluid retention going into the session.</td>
+          </tr>
+          <tr>
+            <td class="ing-name">Dextrose Monohydrate</td>
+            <td class="ing-amount">3,448 mg</td>
+            <td class="ing-why">Not for energy. Not for glycogen. It activates SGLT1, the sodium-glucose co-transporter in the gut that moves sodium across the intestinal wall. Without glucose, this absorption pathway is significantly impaired. Dosed at a 1:1 molar ratio with sodium, capped at the SGLT1 saturation threshold. Every gram is doing work.</td>
+          </tr>
+          <tr>
+            <td class="ing-name">Potassium Citrate</td>
+            <td class="ing-amount">606 mg</td>
+            <td class="ing-why">Two components: sweat replacement proportional to output, plus a flat 150 mg correction for the chronic dietary deficit most people carry. Low potassium impairs the Na/K-ATPase pump that processes the sodium you absorb. Citrate form chosen over KCl for its alkalinizing effect and better tolerability.</td>
+          </tr>
+          <tr>
+            <td class="ing-name">Calcium Lactate</td>
+            <td class="ing-amount">201 mg</td>
+            <td class="ing-why">Sweat replacement at 1.5x the literature sweat concentration. The buffer accounts for individual sweat rate variability. Lactate form for superior bioavailability.</td>
+          </tr>
+          <tr>
+            <td class="ing-name">Magnesium Glycinate</td>
+            <td class="ing-amount">200 mg</td>
+            <td class="ing-why">Not sweat replacement — sweat magnesium loss is trivial. This is a flat functional dose to support Na/K-ATPase activity. Magnesium is a hard biochemical requirement at the enzyme's catalytic site. Without it, the sodium and potassium this formula delivers cannot be properly processed across cell membranes. Glycinate form for approximately 80% bioavailability and minimal GI impact.</td>
+          </tr>
+          <tr>
+            <td class="ing-name">Citric Acid</td>
+            <td class="ing-amount">480 mg</td>
+            <td class="ing-why">pH buffer and palatability agent. Masks the metallic notes from potassium citrate and magnesium glycinate. The only ingredient here primarily for taste, and it earns its place functionally.</td>
+          </tr>
+          <tr>
+            <td class="ing-name">Silicon Dioxide</td>
+            <td class="ing-amount">48 mg</td>
+            <td class="ing-why">Anti-caking agent. 0.8% of total serving mass. No electrolyte function.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- WHY SUGAR -->
+  <section class="section" id="why">
+    <div class="container">
+      <p class="section-label">The question everyone asks</p>
+      <h2 class="section-title">Why is there sugar in this?</h2>
+
+      <div class="callout">
+        <p class="callout-label">The short answer</p>
+        <p class="callout-text">The dextrose is not for energy or calories. It is the key that unlocks the most efficient sodium absorption pathway in your gut. Without it, a significant portion of the sodium passes through unabsorbed.</p>
+      </div>
+
+      <div class="section-body">
+        <p>Your small intestine has a protein called SGLT1, the sodium-glucose co-transporter. It moves sodium and glucose together across the intestinal wall, co-transporting two sodium ions per glucose molecule. This is the same mechanism that oral rehydration solutions have used for decades to treat dehydration in clinical settings.</p>
+        <p>Without luminal glucose, this pathway operates at a fraction of its capacity. Sodium can still be absorbed through other mechanisms, but the efficiency drops substantially.</p>
+        <p>The dextrose in this formula is dosed at a 1:1 molar ratio with sodium, the ORS evidence-based target. It is also capped at the SGLT1 saturation point in solution, which sets the minimum water volume for each tier. Beyond that threshold, additional glucose does not improve absorption. Every gram of dextrose here is activating the pathway, not adding unnecessary sugar.</p>
+        <p><em>The formula delivers 12.5 calories per serving. That is not a meaningful energy contribution. It is the cost of optimal hydration.</em></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW THIS IS DIFFERENT -->
+  <section class="section" id="comparison">
+    <div class="container">
+      <p class="section-label">How this is different</p>
+      <h2 class="section-title">Why not just use LMNT, Liquid IV, or Nuun?</h2>
+      <div class="section-body">
+        <p><strong>LMNT</strong> has strong sodium dosing but no dextrose. The SGLT1 pathway is never activated. The sodium is absorbed, but not as efficiently as it could be.</p>
+        <p><strong>Liquid IV</strong> uses the ORS glucose mechanism but doses sugar far beyond the SGLT1 saturation threshold. The excess glucose is absorbed as calories, not as a transport mechanism. It also adds B vitamins, vitamin C, and other ingredients not justified by the hydration function.</p>
+        <p><strong>Nuun</strong> uses very small glucose doses that likely do not sustain SGLT1 activation throughout consumption. The electrolyte amounts are also lower than most active people need.</p>
+        <p>This is the only product in the consumer market designed explicitly around the SGLT1 saturation ceiling. Enough glucose to fully activate the pathway, not more than that, combined with sodium amounts validated against published sweat research. Three tiers because the demand is different at different intensities, not because the branding needed variety.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- MISSION — commented out, not relevant yet
+  <section class="mission-section" id="mission">
+    <div class="container">
+      <p class="section-label">Mission</p>
+      <h2 class="mission-headline">Every serving funds clean water access for someone who needs it.</h2>
+      <p class="mission-body">
+        A product built around the science of hydration has an obligation to care about access to the thing it optimizes. Every serving sold contributes to clean water access for people who need it. The product and the mission are the same idea.
+      </p>
+    </div>
+  </section>
+  -->
+
+  <!-- EMAIL SIGNUP -->
+  <section class="signup-section" id="signup">
+    <div class="container">
+      <p class="section-label">Early Access</p>
+      <h2 class="signup-title">Be notified at launch.</h2>
+      <p class="signup-sub">No newsletter. One email when the product is ready.</p>
+      <form class="signup-form" id="emailForm">
+        <input type="email" name="email" placeholder="your@email.com" required />
+        <button type="submit">Notify me</button>
+      </form>
+      <p class="signup-confirm" id="signupConfirm">You're on the list.</p>
+      <p class="contact-line">Questions? <a href="https://instagram.com/drinkhydratonics" target="_blank">DM us on Instagram.</a></p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <svg class="brand-svg" viewBox="0 0 49.381504 8.4851494" xmlns="http://www.w3.org/2000/svg" aria-label="Hydratonics" role="img">
+        <g transform="translate(-44.419653,-85.017826)">
+          <path style="fill:#1a181b;" d="m 49.730112,91.533361 c 0.307492,0 1.454353,0.0166 1.55408,0.0166 -0.03324,-0.11635 -0.06648,-0.3158 -0.08311,-0.42384 -0.216076,-0.0249 -0.69809,-0.16621 -0.83937,-0.29087 -0.0083,-0.27425 -0.01662,-0.3158 -0.01662,-0.68147 v -2.83391 c 0,-0.30749 0.0083,-0.764571 0.01662,-0.955721 0.14128,-0.124655 0.606673,-0.241003 0.822748,-0.265935 0.0083,-0.08311 0.04986,-0.307492 0.08311,-0.398909 -0.08311,0 -1.188414,0.01662 -1.520838,0.01662 -0.349044,0 -1.446042,-0.01662 -1.537459,-0.01662 0.04155,0.116349 0.05817,0.290871 0.08311,0.398909 0.216075,0.02493 0.614984,0.14128 0.756264,0.265935 0,0.19115 0.01662,0.498641 0.01662,0.930791 0,0.24101 0,0.62329 -0.01662,0.81444 -0.191144,0.008 -1.030513,0.0166 -1.313073,0.0166 -0.448772,0 -0.922476,-0.008 -1.072066,-0.0166 -0.01662,-0.19115 -0.01662,-0.52357 -0.01662,-0.79782 0,-0.30749 0.0083,-0.756261 0.01662,-0.947411 0.14128,-0.124655 0.540188,-0.241003 0.756263,-0.265935 0.01662,-0.08311 0.04155,-0.28256 0.08311,-0.398909 -0.08311,0 -1.238278,0.01662 -1.537459,0.01662 -0.307492,0 -1.429421,-0.01662 -1.529149,-0.01662 0.04155,0.108038 0.0748,0.307492 0.08311,0.398909 0.216076,0.02493 0.689779,0.14128 0.831059,0.265935 0.0083,0.27425 0.01662,0.606681 0.01662,0.972341 v 2.81729 c 0,0.30749 -0.0083,0.49033 -0.01662,0.68147 -0.14128,0.12466 -0.631604,0.26594 -0.84768,0.29087 -0.01662,0.10804 -0.04986,0.30749 -0.08311,0.42384 0.08311,0 1.229968,-0.0166 1.529149,-0.0166 0.307492,0 1.462664,0.0166 1.562391,0.0166 -0.03324,-0.11635 -0.06649,-0.3158 -0.08311,-0.42384 -0.216076,-0.0249 -0.623294,-0.16621 -0.764574,-0.29087 -0.0083,-0.17452 -0.01662,-0.37398 -0.01662,-0.68978 v -0.77288 c 0,-0.34074 0,-0.59837 0.01662,-0.75627 0.14128,-0.008 0.631604,-0.0166 1.072066,-0.0166 0.307491,0 1.113619,0.008 1.313073,0.0166 0.0083,0.14959 0.01662,0.53188 0.01662,0.78951 v 0.74795 c 0,0.30749 -0.0083,0.49033 -0.01662,0.68147 -0.14128,0.12466 -0.540189,0.26594 -0.756264,0.29087 -0.01662,0.10804 -0.04986,0.30749 -0.08311,0.42384 0.08311,0 1.221657,-0.0166 1.520839,-0.0166 z m 1.88651,-3.54862 c 0.207765,0.0415 0.398908,0.13297 0.540188,0.2327 0.515257,0.98896 1.171793,2.41007 1.620565,3.43227 -0.14128,0.40722 -0.265939,0.7064 -0.482014,1.15517 h -0.04986 c -0.0083,-0.34904 -0.224385,-0.55681 -0.548498,-0.55681 -0.282561,0 -0.573431,0.24101 -0.573431,0.60667 0,0.35736 0.324113,0.64823 0.806127,0.64823 0.515257,0 0.914165,-0.41553 1.138551,-1.01389 0.07479,-0.19115 0.191143,-0.49033 0.407219,-1.03883 0.457082,-1.16348 0.880922,-2.17737 1.346315,-3.19126 0.191144,-0.12466 0.373977,-0.21608 0.598363,-0.27425 0.0083,-0.10804 0.03324,-0.28256 0.05817,-0.37398 -0.08311,0 -0.739643,0.0166 -1.038824,0.0166 -0.307492,0 -0.806127,-0.0166 -0.905854,-0.0166 0.02493,0.0914 0.04986,0.26594 0.05817,0.37398 0.216075,0.0582 0.398908,0.14959 0.556809,0.24932 -0.166211,0.57343 -0.457082,1.35462 -0.756263,2.06933 h -0.03324 c -0.332423,-0.71471 -0.631604,-1.44604 -0.85599,-2.09427 0.124659,-0.0831 0.315802,-0.17452 0.490325,-0.22438 0.0083,-0.10804 0.03324,-0.28256 0.05817,-0.37398 -0.08311,0 -0.988961,0.0166 -1.288142,0.0166 -0.307492,0 -1.105308,-0.0166 -1.205035,-0.0166 0.02493,0.0914 0.04986,0.26594 0.05817,0.37398 z m 5.202424,1.78678 c 0,1.08868 0.781195,1.86988 1.770155,1.86988 0.365666,0 0.897544,-0.55681 1.146862,-0.71471 l 0.03324,0.0249 c 0,0.21607 -0.01662,0.37398 -0.04155,0.58174 l 0.149591,0.12466 c 0.440461,-0.0332 1.304762,-0.17452 1.670428,-0.20777 -0.02493,-0.0997 -0.04155,-0.28256 -0.04986,-0.38228 -0.191144,-0.0332 -0.490325,-0.14128 -0.590052,-0.20777 -0.0083,-0.14128 -0.01662,-0.41553 -0.01662,-0.62329 v -4.138676 c 0,-0.382287 0.02493,-0.731332 0.04155,-0.955718 l -0.14128,-0.124659 c -0.473704,0.0748 -1.470975,0.307492 -1.803398,0.349045 0.03324,0.09142 0.06648,0.28256 0.06648,0.382287 0.166212,0.03324 0.448772,0.124659 0.606673,0.207765 0.0083,0.132969 0.01662,0.315802 0.01662,0.590055 v 0.390591 c 0,0.19115 0,0.41553 0.01662,0.66485 -0.108038,-0.008 -0.332424,-0.0831 -0.581741,-0.0831 -1.205036,0 -2.293723,1.0222 -2.293723,2.25217 z m 1.254899,-0.34074 c 0,-0.96403 0.440461,-1.42942 0.972339,-1.42942 0.448772,0 0.673158,0.36567 0.689779,0.88923 0.0083,0.14128 0.01662,0.3906 0.01662,0.63992 0,0.46539 0,0.84768 -0.01662,1.04713 -0.182833,0.13297 -0.382287,0.26594 -0.723022,0.26594 -0.523567,0 -0.939096,-0.49032 -0.939096,-1.4128 z m 3.664969,2.1192 c 0.08311,0 0.864301,-0.0166 1.163482,-0.0166 0.307492,0 1.637186,0.0166 1.736914,0.0166 -0.02493,-0.0914 -0.04986,-0.26594 -0.05817,-0.37397 -0.216075,-0.0249 -0.747953,-0.14128 -0.889233,-0.2327 -0.0083,-0.2327 -0.01662,-0.46539 -0.01662,-0.83106 v -1.37125 c 0.232697,-0.12466 0.448772,-0.29918 0.723021,-0.32411 0.0748,0.30749 0.324113,0.54019 0.656537,0.54019 0.349045,0 0.639915,-0.28256 0.639915,-0.7064 0,-0.44046 -0.29087,-0.73133 -0.7064,-0.73133 -0.357355,0 -0.930786,0.59005 -1.313073,0.82274 l -0.03324,-0.0249 c 0.0083,-0.25763 0.01662,-0.49032 0.04986,-0.74795 l -0.14959,-0.12466 c -0.473704,0.0748 -1.462664,0.29918 -1.770156,0.34905 0.02493,0.11634 0.05817,0.3158 0.06649,0.38228 0.166212,0.0332 0.465393,0.13297 0.606673,0.20777 0.01662,0.20776 0.01662,0.59836 0.01662,0.81443 v 0.91417 c 0,0.3158 -0.01662,0.7064 -0.01662,0.83106 -0.14128,0.0997 -0.432151,0.20776 -0.648226,0.2327 -0.01662,0.10803 -0.02493,0.28256 -0.05817,0.37397 z m 4.263328,-0.90585 c 0,0.59836 0.473703,1.00558 1.188414,1.00558 0.407219,0 0.764574,-0.40722 1.038824,-0.6233 l 0.01662,0.0249 c 0.06649,0.29918 0.324113,0.55681 0.673158,0.55681 0.498635,0 0.922475,-0.24101 1.171793,-0.52357 -0.05817,-0.0582 -0.13297,-0.16621 -0.174523,-0.25763 -0.06648,0.0499 -0.166211,0.0831 -0.232696,0.0831 -0.199454,0 -0.373977,-0.0665 -0.373977,-0.50695 0,-0.60667 0.0748,-0.97234 0.0748,-1.46266 0,-0.83937 -0.648226,-1.42111 -1.562391,-1.42111 -1.022203,0 -1.711982,0.56512 -1.711982,1.07206 0,0.3906 0.241007,0.57343 0.56512,0.57343 0.257629,0 0.531878,-0.20776 0.531878,-0.4737 0,-0.26594 -0.124659,-0.42384 -0.257628,-0.56512 0.09973,-0.0499 0.274249,-0.0997 0.548499,-0.0997 0.465393,0 0.789506,0.37398 0.789506,0.99727 0,0.0582 -0.0083,0.19946 -0.02493,0.26594 -1.520838,0.0416 -2.26048,0.55681 -2.26048,1.35463 z m 1.229967,-0.14128 c 0,-0.44046 0.332424,-0.82275 0.855991,-0.82275 0.08311,0 0.108037,0.008 0.157901,0.0332 0.0083,0.10804 0.0083,0.20777 0.0083,0.26594 0,0.20776 -0.0083,0.53188 -0.03324,0.67316 -0.207765,0.17452 -0.349045,0.28256 -0.631605,0.28256 -0.207764,0 -0.357355,-0.20777 -0.357355,-0.43215 z m 4.479416,1.15517 c 0.473703,0 1.196724,-0.45708 1.495906,-0.72302 -0.05817,-0.0665 -0.13297,-0.16621 -0.174523,-0.25763 -0.14128,0.0748 -0.498635,0.16621 -0.689779,0.16621 -0.407219,0 -0.473703,-0.34904 -0.473703,-1.03051 v -1.04714 c 0,-0.241 0.0083,-0.48201 0.01662,-0.55681 0.06649,-0.008 0.132969,-0.008 0.199454,-0.008 0.207765,0 0.731332,0.0166 0.922476,0.0416 0.01662,-0.17453 0.06648,-0.49033 0.116348,-0.65654 -0.14128,0.008 -0.731332,0.0416 -1.013892,0.0416 -0.09142,0 -0.182833,0 -0.232697,-0.008 -0.0083,-0.10803 -0.0083,-0.48201 -0.0083,-0.58174 0,-0.17452 0,-0.340731 0.0083,-0.590051 -0.174522,0.0831 -0.614983,0.14959 -0.764574,0.1579 -0.09142,0.216081 -0.224386,0.656541 -0.382287,0.822751 -0.224386,0.19114 -0.482014,0.34073 -0.69809,0.40722 0.03324,0.0914 0.0748,0.27425 0.08311,0.38229 0.05817,-0.008 0.207765,-0.0166 0.28256,-0.0166 0.116349,0 0.182833,0 0.265939,0.008 0.0083,0.0748 0.01662,0.31581 0.01662,0.55681 v 0.65654 c 0,0.28256 -0.0083,0.49864 -0.0083,0.88923 0,0.91417 0.398908,1.34632 1.038824,1.34632 z m 1.736907,-2.02778 c 0,1.12193 0.806127,2.02778 2.11089,2.02778 1.246588,0 2.26048,-0.90585 2.26048,-2.11089 0,-1.16348 -0.864301,-2.02778 -2.127511,-2.02778 -1.26321,0 -2.243859,0.8643 -2.243859,2.11089 z m 1.288141,-0.0831 c 0,-1.03882 0.332424,-1.54577 0.855991,-1.54577 0.55681,0 0.939097,0.5485 0.939097,1.62888 0,1.03051 -0.407219,1.54577 -0.889233,1.54577 -0.598363,0 -0.905855,-0.55681 -0.905855,-1.62888 z m 3.47382,2.00285 c 0.08311,0 1.063755,-0.0166 1.362936,-0.0166 0.307492,0 1.005582,0.0166 1.105309,0.0166 -0.02493,-0.0914 -0.05817,-0.26594 -0.05817,-0.37397 -0.13297,-0.0332 -0.315803,-0.12466 -0.457083,-0.2327 -0.0083,-0.24101 -0.01662,-0.4737 -0.01662,-0.83937 v -1.55408 c 0.257628,-0.13297 0.465393,-0.17452 0.723021,-0.17452 0.390598,0 0.7064,0.27425 0.7064,0.92247 v 0.80613 c 0,0.34904 -0.01662,0.74795 -0.01662,0.83937 -0.14959,0.10804 -0.315802,0.19114 -0.457082,0.2327 -0.0083,0.10803 -0.03324,0.28256 -0.05817,0.37397 0.08311,0 0.864301,-0.0166 1.163482,-0.0166 0.307492,0 1.146862,0.0166 1.246589,0.0166 -0.02493,-0.0914 -0.04986,-0.26594 -0.05817,-0.37397 -0.149591,-0.0249 -0.448772,-0.14128 -0.590052,-0.2327 -0.0083,-0.24101 -0.01662,-0.4737 -0.01662,-0.83937 v -1.17179 c 0,-0.88093 -0.482015,-1.4128 -1.304763,-1.4128 -0.41553,0 -1.047134,0.49032 -1.338005,0.68146 l -0.03324,-0.0249 c 0.0083,-0.21607 0.02493,-0.42384 0.04986,-0.60667 l -0.14959,-0.12466 c -0.473704,0.0748 -1.462664,0.29918 -1.770156,0.34905 0.02493,0.11634 0.05817,0.3158 0.06649,0.38228 0.166211,0.0332 0.448771,0.12466 0.606673,0.20777 0.0083,0.27425 0.01662,0.5485 0.01662,0.76457 v 0.95572 c 0,0.3158 -0.01662,0.71471 -0.01662,0.83937 -0.166212,0.0997 -0.457083,0.19945 -0.648226,0.2327 -0.0083,0.10803 -0.03324,0.28256 -0.05817,0.37397 z m 5.484988,0 c 0.08311,0 1.030513,-0.0166 1.329694,-0.0166 0.307489,0 1.205036,0.0166 1.304756,0.0166 -0.0249,-0.0914 -0.0499,-0.26594 -0.0582,-0.37397 -0.216077,-0.0416 -0.473697,-0.14128 -0.623287,-0.2327 -0.008,-0.2327 -0.0166,-0.46539 -0.0166,-0.83106 v -1.67874 c 0,-0.25763 0.0166,-0.56512 0.0332,-0.85599 l -0.1579,-0.13297 c -0.473708,0.0748 -1.454358,0.30749 -1.778471,0.34905 0.02493,0.10803 0.05817,0.3158 0.06649,0.38228 0.182833,0.0332 0.448772,0.12466 0.606673,0.20777 0.0083,0.27425 0.01662,0.71471 0.01662,0.93078 v 0.78951 c 0,0.34073 -0.01662,0.75626 -0.01662,0.83937 -0.182833,0.0997 -0.432151,0.19114 -0.648226,0.2327 -0.0083,0.10803 -0.03324,0.28256 -0.05817,0.37397 z m 0.506946,-5.559784 c 0,0.373973 0.28256,0.648223 0.681468,0.648223 0.407219,0 0.689779,-0.340731 0.689779,-0.714708 0,-0.373976 -0.25763,-0.648226 -0.689779,-0.648226 -0.407219,0 -0.681468,0.315803 -0.681468,0.714711 z m 2.435004,3.673284 c 0,1.17179 0.80613,1.99454 2.01947,1.99454 0.59006,0 1.23828,-0.44877 1.55409,-0.78951 -0.0582,-0.0499 -0.13297,-0.17452 -0.15791,-0.24931 -0.25762,0.12465 -0.71471,0.241 -1.0222,0.241 -0.65654,0 -1.12193,-0.48201 -1.12193,-1.32138 0,-1.08869 0.42384,-1.53746 0.95572,-1.53746 0.21608,0 0.42384,0.0582 0.51526,0.11635 v 0.0332 c -0.17453,0.0665 -0.32412,0.28256 -0.32412,0.50695 0,0.33242 0.24101,0.53187 0.54019,0.53187 0.33243,0 0.59836,-0.26593 0.59836,-0.68977 0,-0.50695 -0.63991,-0.98065 -1.47928,-0.98065 -1.23828,0 -2.07765,0.87261 -2.07765,2.14413 z m 4.07218,1.67874 c 0.29088,0.16621 0.69809,0.3158 1.31308,0.3158 1.15517,0 1.77846,-0.53188 1.77846,-1.26321 0,-0.63992 -0.26593,-0.98896 -1.24658,-1.34632 -0.67316,-0.24931 -0.76458,-0.44877 -0.76458,-0.68146 0,-0.22439 0.21608,-0.42384 0.45708,-0.42384 0.20777,0 0.32412,0.0249 0.44878,0.0914 0.19114,0.16621 0.40721,0.44046 0.54849,0.76458 0.0914,-0.0249 0.25763,-0.0582 0.34905,-0.0748 -0.0748,-0.30749 -0.11635,-0.78119 -0.11635,-1.03051 -0.19945,-0.10804 -0.72302,-0.21608 -1.0222,-0.21608 -1.07207,0 -1.68705,0.54019 -1.68705,1.27983 0,0.63992 0.36567,1.0139 1.12193,1.29646 0.71471,0.26593 0.83106,0.41553 0.83106,0.69809 0,0.26593 -0.25763,0.44877 -0.57343,0.44877 -0.29087,0 -0.4654,-0.0582 -0.63992,-0.17453 -0.1579,-0.18283 -0.46539,-0.68146 -0.55681,-0.8643 -0.0914,0.0249 -0.30749,0.0831 -0.3906,0.0831 0.0748,0.44046 0.12466,0.61498 0.14959,1.097 z" />
+        </g>
+      </svg>
+      <ul class="footer-links">
+        <li><a href="https://instagram.com/drinkhydratonics" target="_blank">@drinkhydratonics</a></li>
+        <li><a href="https://tiktok.com/@hydratonics" target="_blank">@hydratonics</a></li>
+        <li><a href="https://hydratonics.denesgarda.com">hydratonics.denesgarda.com</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    const form = document.getElementById('emailForm');
+    const confirm = document.getElementById('signupConfirm');
+
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const email = form.querySelector('input[name="email"]').value;
+      const button = form.querySelector('button');
+      button.textContent = 'Submitting...';
+      button.disabled = true;
+      try {
+        await fetch('https://script.google.com/macros/s/AKfycbzLnXNjdvOQmxQqZ08r_MUv9LHcgI49q7CwyK3rcTTR3yQaHIdgbOvDXHb5wzF3gssV/exec', {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: 'email=' + encodeURIComponent(email)
+        });
+      } catch(err) { /* no-cors — treat as success */ }
+      form.style.display = 'none';
+      confirm.style.display = 'block';
+    });
+  </script>
+
+</body>
+</html>
