@@ -167,7 +167,6 @@
       line-height: 1;
       letter-spacing: -0.02em;
       margin-bottom: 24px;
-      /* no max-width — lines are controlled by white-space below */
     }
     .hero-headline em {
       font-style: normal;
@@ -175,15 +174,24 @@
     }
     .headline-line {
       display: block;
-      white-space: nowrap;  /* each line is explicitly set, never reflowed */
+      white-space: nowrap;
     }
     .headline-line + .headline-line {
       margin-top: 0.22em;
     }
-    /* On very small screens, allow wrapping and fall back to normal flow */
-    @media (max-width: 420px) {
-      .hero-headline { font-size: 8vw; }
-      .headline-line { white-space: normal; }
+    /* Mobile: release nowrap, scale font to fill width naturally */
+    @media (max-width: 600px) {
+      .hero-headline {
+        font-size: 8.5vw;
+        letter-spacing: -0.025em;
+      }
+      .headline-line {
+        white-space: normal;
+        display: inline;
+      }
+      .headline-line + .headline-line::before {
+        content: ' ';
+      }
     }
     .hero-sub {
       font-family: var(--font-mono);
@@ -491,7 +499,7 @@
       flex-wrap: wrap;
       gap: 12px;
     }
-    .footer-links { display: flex; gap: 24px; list-style: none; }
+    .footer-links { display: flex; gap: 24px; list-style: none; flex-wrap: wrap; }
     .footer-links a {
       font-family: var(--font-mono);
       font-size: 11px;
@@ -505,12 +513,26 @@
 
     /* ── RESPONSIVE ─────────────────────────────────────── */
     @media (max-width: 600px) {
+      /* prevent any element causing horizontal scroll */
+      body { overflow-x: hidden; }
+
       .tiers-grid { grid-template-columns: 1fr; }
       .nav-links { display: none; }
       .signup-form { flex-direction: column; }
       .signup-form input[type="email"] { border-right: 1px solid var(--ink); border-bottom: none; }
       .signup-form button { width: 100%; }
       .ing-name, .ing-amount { white-space: normal; }
+
+      /* footer stacks vertically */
+      footer .container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
+      .footer-links {
+        flex-direction: column;
+        gap: 10px;
+      }
     }
 
   </style>
