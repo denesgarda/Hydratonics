@@ -352,41 +352,35 @@
     }
 
     /* ── INGREDIENT TABLE ───────────────────────────────── */
-    .ingredient-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 32px;
+    .ingredient-list {
+      margin-top: 36px;
+      display: flex;
+      flex-direction: column;
     }
-    .ingredient-table th {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      font-weight: 500;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--grey-mid);
-      text-align: left;
-      padding: 10px 14px;
-      border-bottom: 1px solid var(--rule);
+    .ing-row {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 0 40px;
+      padding: 22px 0;
+      border-top: 1px solid var(--rule);
+      align-items: baseline;
     }
-    .ingredient-table td {
-      padding: 14px;
-      border-bottom: 1px solid var(--rule);
-      vertical-align: top;
-    }
-    .ingredient-table tr:last-child td { border-bottom: none; }
+    .ing-row:last-child { border-bottom: 1px solid var(--rule); }
+    .ing-left {}
     .ing-name {
       font-family: var(--font-display);
       font-weight: var(--font-display-weight);
-      font-size: 13px;
+      font-size: 15px;
       color: var(--ink);
-      white-space: nowrap;
+      line-height: 1.2;
+      margin-bottom: 6px;
     }
-    .ing-amount {
+    .ing-elemental {
       font-family: var(--font-mono);
-      font-size: 13px;
+      font-size: 11px;
       font-weight: 500;
       color: var(--t1-blue);
-      white-space: nowrap;
+      letter-spacing: 0.04em;
     }
     .ing-why {
       font-family: var(--font-body);
@@ -520,7 +514,8 @@
       .signup-form { flex-direction: column; }
       .signup-form input[type="email"] { border-right: 1px solid var(--ink); border-bottom: none; }
       .signup-form button { width: 100%; }
-      .ing-name, .ing-amount { white-space: normal; }
+      .ing-row { grid-template-columns: 1fr; gap: 8px 0; }
+      .ing-elemental { margin-bottom: 6px; }
 
       /* footer stacks vertically */
       footer .container {
@@ -613,54 +608,65 @@
       <p class="section-label">The Formula — Tier I</p>
       <h2 class="section-title">Every ingredient has a job. Nothing else is here.</h2>
       <p class="section-body">
-        Sodium is the anchor. Everything else exists in relation to it, calculated from sweat research, not chosen for a label. Here is exactly what is in Tier I and why.
+        Sodium is the anchor. Everything else exists in relation to it, calculated from sweat research, not chosen for a label. Here is what is in Tier I and why.
       </p>
-      <table class="ingredient-table">
-        <thead>
-          <tr>
-            <th>Ingredient</th>
-            <th>Amount</th>
-            <th>Why it's here</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="ing-name">Sodium Chloride</td>
-            <td class="ing-amount">1,017 mg</td>
-            <td class="ing-why">Primary sweat electrolyte. 400 mg elemental sodium, validated against ACSM sweat research. Pre-exercise sodium improves fluid retention going into the session.</td>
-          </tr>
-          <tr>
-            <td class="ing-name">Dextrose Monohydrate</td>
-            <td class="ing-amount">3,448 mg</td>
-            <td class="ing-why">Not for energy. Not for glycogen. It activates SGLT1, the sodium-glucose co-transporter in the gut that moves sodium across the intestinal wall. Without glucose, this absorption pathway is significantly impaired. Dosed at a 1:1 molar ratio with sodium, capped at the SGLT1 saturation threshold. Every gram is doing work.</td>
-          </tr>
-          <tr>
-            <td class="ing-name">Potassium Citrate</td>
-            <td class="ing-amount">606 mg</td>
-            <td class="ing-why">Two components: sweat replacement proportional to output, plus a flat 150 mg correction for the chronic dietary deficit most people carry. Low potassium impairs the Na/K-ATPase pump that processes the sodium you absorb. Citrate form chosen over KCl for its alkalinizing effect and better tolerability.</td>
-          </tr>
-          <tr>
-            <td class="ing-name">Calcium Lactate</td>
-            <td class="ing-amount">201 mg</td>
-            <td class="ing-why">Sweat replacement at 1.5x the literature sweat concentration. The buffer accounts for individual sweat rate variability. Lactate form for superior bioavailability.</td>
-          </tr>
-          <tr>
-            <td class="ing-name">Magnesium Glycinate</td>
-            <td class="ing-amount">200 mg</td>
-            <td class="ing-why">Not sweat replacement — sweat magnesium loss is trivial. This is a flat functional dose to support Na/K-ATPase activity. Magnesium is a hard biochemical requirement at the enzyme's catalytic site. Without it, the sodium and potassium this formula delivers cannot be properly processed across cell membranes. Glycinate form for approximately 80% bioavailability and minimal GI impact.</td>
-          </tr>
-          <tr>
-            <td class="ing-name">Citric Acid</td>
-            <td class="ing-amount">480 mg</td>
-            <td class="ing-why">pH buffer and palatability agent. Masks the metallic notes from potassium citrate and magnesium glycinate. The only ingredient here primarily for taste, and it earns its place functionally.</td>
-          </tr>
-          <tr>
-            <td class="ing-name">Silicon Dioxide</td>
-            <td class="ing-amount">48 mg</td>
-            <td class="ing-why">Anti-caking agent. 0.8% of total serving mass. No electrolyte function.</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="ingredient-list">
+
+        <div class="ing-row">
+          <div class="ing-left">
+            <p class="ing-name">Sodium Chloride</p>
+            <p class="ing-elemental">400 mg elemental sodium</p>
+          </div>
+          <p class="ing-why">The anchor. Every other ingredient exists in relation to it. 400 mg is the Tier I target, validated against ACSM sweat research, and slightly above pure sweat replacement to improve fluid retention going into the session.</p>
+        </div>
+
+        <div class="ing-row">
+          <div class="ing-left">
+            <p class="ing-name">Dextrose Monohydrate</p>
+            <p class="ing-elemental">1:1 molar ratio with sodium</p>
+          </div>
+          <p class="ing-why">Not for energy. Not for glycogen. It activates SGLT1, the sodium-glucose co-transporter in the gut wall responsible for the most efficient sodium absorption pathway in the body. Without luminal glucose, this pathway operates at a fraction of its capacity. Every gram is doing work.</p>
+        </div>
+
+        <div class="ing-row">
+          <div class="ing-left">
+            <p class="ing-name">Potassium Citrate</p>
+            <p class="ing-elemental">232 mg elemental potassium</p>
+          </div>
+          <p class="ing-why">Two components added together: sweat replacement proportional to output, plus a flat correction for the chronic dietary deficit most people carry. Low potassium impairs the Na/K-ATPase pump that processes the sodium you absorb. Citrate form chosen over chloride for its alkalinizing effect and better tolerability.</p>
+        </div>
+
+        <div class="ing-row">
+          <div class="ing-left">
+            <p class="ing-name">Calcium Lactate</p>
+            <p class="ing-elemental">36.9 mg elemental calcium</p>
+          </div>
+          <p class="ing-why">Sweat replacement at 1.5× the literature sweat concentration. The buffer accounts for individual variability in sweat rate and dietary absorption. No deficiency argument, just replacing what you lose.</p>
+        </div>
+
+        <div class="ing-row">
+          <div class="ing-left">
+            <p class="ing-name">Magnesium Glycinate</p>
+            <p class="ing-elemental">28.2 mg elemental magnesium</p>
+          </div>
+          <p class="ing-why">Not sweat replacement — magnesium loss in sweat is trivial. This is a flat functional dose because magnesium is a hard biochemical requirement at the Na/K-ATPase catalytic site. Without adequate intracellular magnesium, the pump that moves sodium and potassium across cell membranes is directly impaired, regardless of how much sodium and potassium you take in. Glycinate form for approximately 80% bioavailability and minimal GI impact.</p>
+        </div>
+
+        <div class="ing-row">
+          <div class="ing-left">
+            <p class="ing-name">Citric Acid</p>
+          </div>
+          <p class="ing-why">pH buffer and palatability agent. Masks the metallic notes from the potassium and magnesium compounds. The only ingredient here primarily for taste, and it earns its place functionally.</p>
+        </div>
+
+        <div class="ing-row">
+          <div class="ing-left">
+            <p class="ing-name">Silicon Dioxide</p>
+          </div>
+          <p class="ing-why">Anti-caking agent. No electrolyte or absorption function.</p>
+        </div>
+
+      </div>
     </div>
   </section>
 
