@@ -12,7 +12,7 @@
       font-weight: 900;
       font-style: normal;
       font-display: swap;
-      src: url('../fonts/avenir-ultra-bold.woff2') format('woff2');
+      src: url('../../fonts/avenir-ultra-bold.woff2') format('woff2');
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -575,7 +575,7 @@
     <p class="confirm-title">Received.</p>
     <p class="confirm-body">This feedback directly shapes what this product becomes. Thank you.</p>
     <div class="confirm-rule"></div>
-    <a href="../" class="confirm-link">Learn more about Hydratonics →</a>
+    <a href="../../" class="confirm-link">Learn more about Hydratonics →</a>
   </div>
 
   <script>
@@ -645,6 +645,7 @@
         return el ? el.value : '';
       };
       return {
+        projectId:      '01',
         sampleId:       document.getElementById('sampleId').value.trim(),
         performance:    val('performance'),
         gi:             val('gi'),
