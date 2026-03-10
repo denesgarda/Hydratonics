@@ -332,11 +332,12 @@
       btn.disabled = true;
 
       const data = {
-        formType:    'taste-sample',
-        taste:       taste ? taste.value : '',
-        offputting:  offputting ? offputting.value : '',
+        formType:     'taste-sample',
+        projectId:    '02',
+        taste:        taste ? taste.value : '',
+        offputting:   offputting ? offputting.value : '',
         openFeedback: document.getElementById('openFeedback').value.trim(),
-        submittedAt: new Date().toISOString()
+        submittedAt:  new Date().toISOString()
       };
 
       fetch(SCRIPT_URL, {
@@ -350,6 +351,7 @@
     }
 
     function showConfirmation() {
+      document.querySelector('.form-header').style.display = 'none';
       document.getElementById('formContainer').style.display = 'none';
       const conf = document.getElementById('confirmation');
       conf.classList.add('visible');
