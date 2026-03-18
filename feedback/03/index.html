@@ -181,6 +181,13 @@
 
     .textarea-input:focus { border-color: var(--t1-blue); }
 
+    /* Conditional reveal */
+    .conditional {
+      display: none;
+      margin-top: 24px;
+    }
+    .conditional.visible { display: block; }
+
     /* ── SUBMIT ── */
     .btn-submit {
       font-family: var(--font-display);
@@ -250,6 +257,26 @@
       text-decoration: none;
     }
     .confirm-link:hover { color: var(--ink); }
+
+    .btn-instagram {
+      display: inline-block;
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 15px;
+      letter-spacing: -0.01em;
+      padding: 16px 28px;
+      border: 1.5px solid var(--t1-blue);
+      background: var(--t1-blue);
+      color: var(--white);
+      text-decoration: none;
+      margin-bottom: 20px;
+      transition: background 0.15s, border-color 0.15s;
+      -webkit-appearance: none;
+      border-radius: 0;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .btn-instagram:hover { background: #2a52d4; border-color: #2a52d4; }
   </style>
 </head>
 <body>
@@ -296,6 +323,10 @@
         <label class="opt"><input type="radio" name="usage" value="Yes" /><span class="opt-text">Yes</span></label>
         <label class="opt"><input type="radio" name="usage" value="No" /><span class="opt-text">No</span></label>
       </div>
+      <div class="conditional" id="usageNoReveal">
+        <label class="q-label" for="whatWouldHelp">What would need to be different for this to be a yes? <span style="color: var(--grey-mid); font-size: 13px;">(optional, but strongly appreciated)</span></label>
+        <textarea class="textarea-input" id="whatWouldHelp" name="whatWouldHelp" placeholder="e.g. if it had no taste at all, if it came in a flavor, if the price was lower…" style="min-height: 80px;"></textarea>
+      </div>
     </div>
 
     <div class="q-block">
@@ -311,11 +342,20 @@
     <p class="confirm-title">Received.</p>
     <p class="confirm-body">That's exactly the kind of feedback that matters. Thank you.</p>
     <div class="confirm-rule"></div>
+    <a href="https://www.instagram.com/drinkhydratonics" target="_blank" rel="noopener" class="btn-instagram">Follow the build on Instagram →</a>
+    <br>
     <a href="../../" class="confirm-link">Learn more about Hydratonics →</a>
   </div>
 
   <script>
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzLnXNjdvOQmxQqZ08r_MUv9LHcgI49q7CwyK3rcTTR3yQaHIdgbOvDXHb5wzF3gssV/exec';
+
+    // Conditional reveal — show "what would help" when usage = No
+    document.querySelectorAll('input[name="usage"]').forEach(el => {
+      el.addEventListener('change', () => {
+        document.getElementById('usageNoReveal').classList.toggle('visible', el.value === 'No');
+      });
+    });
 
     function submitForm() {
       const requiredFields = { 'q-taste': 'taste', 'q-offputting': 'offputting', 'q-usage': 'usage' };
@@ -340,13 +380,14 @@
       const val = name => document.querySelector(`input[name="${name}"]:checked`)?.value || '';
 
       const data = {
-        formType:     'taste-sample',
-        projectId:    '03',
-        taste:        val('taste'),
-        offputting:   val('offputting'),
-        usage:        val('usage'),
-        openFeedback: document.getElementById('openFeedback').value.trim(),
-        submittedAt:  new Date().toISOString()
+        formType:        'taste-sample',
+        projectId:       '03',
+        taste:           val('taste'),
+        offputting:      val('offputting'),
+        usage:           val('usage'),
+        whatWouldHelp:   document.getElementById('whatWouldHelp').value.trim(),
+        openFeedback:    document.getElementById('openFeedback').value.trim(),
+        submittedAt:     new Date().toISOString()
       };
 
       fetch(SCRIPT_URL, {
