@@ -1239,10 +1239,22 @@
     // return to (e.g. this page was opened directly).
     var backlink = document.querySelector('.formula-backlink');
     if (backlink) {
+      // This page's own "Jump to:" links (and any #anchor navigation
+      // within it) each push a new history entry, so a plain
+      // history.back() would just strip the hash and leave you on this
+      // page instead of returning home. Count those in-page hash
+      // pushes and skip back past all of them in one go, so "Back to
+      // home" still lands on the real previous page (with its scroll
+      // position restored, same as a native back button) regardless of
+      // how many anchors were clicked first.
+      var hashNavCount = 0;
+      window.addEventListener('hashchange', function () {
+        hashNavCount++;
+      });
       backlink.addEventListener('click', function (e) {
         if (window.history.length > 1) {
           e.preventDefault();
-          history.back();
+          history.go(-(1 + hashNavCount));
         }
       });
     }
