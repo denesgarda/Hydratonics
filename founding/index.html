@@ -53,6 +53,12 @@
       --t2-amber:    rgba(255, 165, 52,  1);
       --t3-red:      rgba(211, 95,  95,  1);
 
+      /* This whole page runs dark (deliberately unlike the rest of the
+         site) to feel like a separate, invite-only space. --rule-dark
+         is the one net-new token — light-mode's --rule (#e0e0e0) reads
+         as a harsh bright line against a dark background. */
+      --rule-dark:   #333333;
+
       --font-display: 'Avenir', 'Avenir Next', 'Franklin Gothic Heavy', 'Arial Black', sans-serif;
       --font-body:    'STIX Two Text', Georgia, serif;
       --font-mono:    'DM Mono', 'Courier New', monospace;
@@ -67,8 +73,8 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
     body {
-      background: var(--white);
-      color: var(--ink);
+      background: var(--ink);
+      color: var(--off-white);
       font-family: var(--font-body);
       font-size: 16px;
       line-height: 1.6;
@@ -114,13 +120,14 @@
     /* ── NAV ────────────────────────────────────────────── */
     nav {
       padding: 20px 0;
-      border-bottom: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule-dark);
       position: sticky;
       top: 0;
-      background: rgba(255,255,255,0.95);
+      background: rgba(26,26,26,0.95);
       backdrop-filter: blur(8px);
       z-index: 100;
     }
+    nav .brand-svg { filter: invert(1); }
     nav .container {
       display: flex;
       align-items: center;
@@ -610,7 +617,7 @@
     .contact-line a:hover { color: var(--t1-blue); }
 
     /* ── FOOTER (dark) ──────────────────────────────────── */
-    footer { padding: 32px 0; background: var(--ink); }
+    footer { padding: 32px 0; background: var(--ink); border-top: 1px solid var(--rule-dark); }
     footer .brand-svg { filter: invert(1); }
     footer .container {
       display: flex;
@@ -661,6 +668,7 @@
         flex-direction: column;
         gap: 10px;
       }
+
     }
 
 
@@ -672,10 +680,10 @@
       font-weight: 500;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--grey-mid);
+      color: var(--grey-light);
       transition: color 0.2s;
     }
-    .formula-backlink:hover { color: var(--ink); }
+    .formula-backlink:hover { color: var(--off-white); }
     .nav-current { color: var(--ink) !important; }
 
     /* ── FOUNDING MEMBERS APP ───────────────────────────────── */
@@ -695,6 +703,15 @@
       justify-content: flex-start;
       padding: 72px 0 48px;
     }
+    @media (max-width: 600px) {
+      /* The mobile footer's stacked links make it tall enough that, on
+         short content (e.g. the code-entry step), flex:1 would otherwise
+         squeeze it entirely into view within one screen. Forcing this
+         area to at least fill the viewport pushes the footer below the
+         fold so seeing all of it takes an ordinary scroll down the page,
+         instead of the footer dominating the first screen. */
+      #founding-app { min-height: 100vh; }
+    }
     #founding-app .container { text-align: center; width: 100%; }
 
     .founding-eyebrow {
@@ -703,7 +720,7 @@
       font-weight: 500;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: var(--grey-mid);
+      color: var(--grey-light);
       margin-bottom: 16px;
     }
     .founding-heading {
@@ -716,7 +733,7 @@
     .founding-lead {
       font-family: var(--font-body);
       font-size: 16px;
-      color: var(--grey-dark);
+      color: var(--grey-light);
       margin-top: 10px;
     }
 
@@ -725,14 +742,14 @@
        rather than the site's marketing-CTA button style. */
     .founding-input {
       width: 100%;
-      border: 1px solid var(--rule);
+      border: 1px solid var(--rule-dark);
       padding: 13px 16px;
       font-family: var(--font-body);
       font-size: 15px;
       text-align: left;
       outline: none;
-      background: var(--white);
-      color: var(--ink);
+      background: var(--ink);
+      color: var(--off-white);
       border-radius: 0;
       -webkit-appearance: none;
       transition: border-color 0.15s;
@@ -740,6 +757,8 @@
     .founding-input::placeholder { color: var(--grey-mid); }
     .founding-input:focus { border-color: var(--t1-blue); }
 
+    /* Button colors invert relative to the light-mode version so it
+       still reads as the primary action against a dark page. */
     .founding-button {
       display: block;
       width: 100%;
@@ -748,15 +767,15 @@
       font-size: 15px;
       letter-spacing: -0.01em;
       padding: 16px 28px;
-      border: 1.5px solid var(--ink);
-      background: var(--ink);
-      color: var(--white);
+      border: 1.5px solid var(--off-white);
+      background: var(--off-white);
+      color: var(--ink);
       cursor: pointer;
       border-radius: 0;
       -webkit-appearance: none;
       transition: background 0.15s, border-color 0.15s;
     }
-    .founding-button:hover:not(:disabled) { background: #333; border-color: #333; }
+    .founding-button:hover:not(:disabled) { background: var(--white); border-color: var(--white); }
     .founding-button:disabled { opacity: 0.5; cursor: default; }
     .founding-home-btn { display: inline-block; width: auto; text-decoration: none; }
 
@@ -782,9 +801,9 @@
       font-family: var(--font-mono);
       font-size: 18px;
       font-weight: 500;
-      border: 1px solid var(--rule);
-      background: var(--white);
-      color: var(--ink);
+      border: 1px solid var(--rule-dark);
+      background: var(--ink);
+      color: var(--off-white);
       border-radius: 0;
       outline: none;
       padding: 0;
@@ -810,7 +829,7 @@
       display: block;
       font-family: var(--font-body);
       font-size: 14px;
-      color: var(--grey-dark);
+      color: var(--grey-light);
       margin-bottom: 8px;
     }
     .founding-hint {
@@ -829,7 +848,7 @@
       min-height: 16px;
     }
     .founding-status-error { color: var(--t3-red); }
-    .founding-status-pending { color: var(--grey-mid); }
+    .founding-status-pending { color: var(--grey-light); }
 
     /* Step 3: confirmation, matching the feedback survey's #confirmation pattern */
     .founding-confirm-title {
@@ -844,11 +863,11 @@
       font-family: var(--font-body);
       font-size: 16px;
       line-height: 1.6;
-      color: var(--grey-dark);
+      color: var(--grey-light);
     }
     .founding-confirm-rule {
       height: 1px;
-      background: var(--rule);
+      background: var(--rule-dark);
       max-width: 200px;
       margin: 32px auto;
     }
@@ -876,7 +895,7 @@
     <a href="/" class="formula-backlink">&larr; Back to home</a>
   </div>
 
-  <!-- PRIVACY POLICY -->
+  <!-- FOUNDING MEMBERS APP -->
   <section id="founding-app">
     <div class="container">
 

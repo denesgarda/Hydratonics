@@ -94,6 +94,14 @@
       padding: 72px 0 64px;
       border-bottom: 1px solid var(--rule);
     }
+    @media (max-width: 600px) {
+      /* The mobile footer's stacked links make it tall enough that
+         flex:1 would otherwise squeeze it entirely into view on this
+         short page. Forcing this area to fill the viewport pushes the
+         footer below the fold so seeing all of it takes an ordinary
+         scroll, instead of the footer dominating the first screen. */
+      .hero { min-height: 100vh; }
+    }
     .hero-eyebrow {
       font-family: var(--font-mono);
       font-size: 11px;
@@ -168,6 +176,7 @@
 
     @media (max-width: 600px) {
       footer .container { flex-direction: column; align-items: flex-start; }
+
     }
   </style>
 </head>
