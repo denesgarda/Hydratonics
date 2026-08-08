@@ -32,6 +32,7 @@
       --ink:        #1a1a1a;
       --grey-dark:  #555555;
       --grey-mid:   #888888;
+      --grey-light: #cccccc;
       --rule:       #e0e0e0;
       --t1-blue:    rgba(91, 148, 249, 1);
       --max-w:      760px;
@@ -133,8 +134,9 @@
       .hero-headline { font-size: 8.5vw; letter-spacing: -0.025em; }
     }
 
-    /* ── FOOTER ── */
-    footer { padding: 32px 0; }
+    /* ── FOOTER (dark) ── */
+    footer { padding: 32px 0; background: var(--ink); }
+    footer .brand-svg { filter: invert(1); }
     footer .container {
       display: flex;
       align-items: center;
@@ -149,10 +151,10 @@
       font-weight: 500;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--grey-mid);
+      color: var(--grey-light);
       transition: color 0.2s;
     }
-    .footer-links a:hover { color: var(--ink); }
+    .footer-links a:hover { color: var(--white); }
     .footer-copyright {
       margin-top: 20px;
       font-family: var(--font-mono);
