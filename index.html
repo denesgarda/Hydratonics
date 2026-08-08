@@ -249,22 +249,32 @@
     .hero-live-status {
       display: flex;
       align-items: center;
-      gap: 8px;
+      flex-wrap: wrap;
+      column-gap: 8px;
       font-family: var(--font-mono);
       font-size: 13px;
       color: var(--grey-dark);
-      white-space: nowrap;
       margin-bottom: 10px;
     }
-    /* The one-line "nowrap" treatment only fits on wider screens —
-       on mobile the sentence is wider than the viewport, so let it
-       wrap there instead of overflowing off the right edge. */
+    /* Two deliberate segments, not organic text-wrapping — flexbox
+       treats the dot, this text run, and the <strong> as separate
+       items, so letting it wrap freely broke into three ragged lines
+       instead of one clean break. Force the break at a chosen point
+       instead: line 1 (dot + "Tier I is 85% built.") stays together,
+       line 2 drops below as its own full-width row on mobile. */
+    .hero-status-line1 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+    .hero-status-line2 { white-space: nowrap; }
     @media (max-width: 600px) {
-      .hero-live-status {
-        white-space: normal;
-        align-items: flex-start;
+      .hero-status-line2 {
+        display: block;
+        width: 100%;
+        margin-top: 4px;
       }
-      .hero-status-dot { margin-top: 5px; }
     }
     .hero-live-status strong { color: var(--t1-blue); font-weight: 700; }
     .hero-status-dot {
@@ -951,8 +961,11 @@
       <!-- Draft: live status teaser, leads into the CTAs -->
       <div class="hero-live-status-wrap">
         <p class="hero-live-status">
-          <span class="hero-status-dot"></span>
-          Tier I is <strong>85% built.</strong> Be first to know when it ships.
+          <span class="hero-status-line1">
+            <span class="hero-status-dot"></span>
+            Tier I is <strong>85% built.</strong>
+          </span>
+          <span class="hero-status-line2">Be first to know when it ships.</span>
         </p>
         <div class="hero-status-bar"><div class="hero-status-fill" style="width: 85%;"></div></div>
       </div>
