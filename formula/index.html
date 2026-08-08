@@ -497,6 +497,19 @@
       line-height: 1.65;
       max-width: var(--max-w-text);
     }
+    .ing-faq-link {
+      display: inline-block;
+      grid-column: 2;
+      margin-top: 8px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.02em;
+      color: var(--t1-blue);
+    }
+    @media (max-width: 600px) {
+      .ing-faq-link { grid-column: 1; }
+    }
+    .ing-faq-link:hover { text-decoration: underline; }
 
     /* ── MISSION ────────────────────────────────────────── */
     .mission-section {
@@ -708,6 +721,7 @@
             <p class="ing-elemental">1:1 molar ratio with sodium</p>
           </div>
           <p class="ing-why">Not for energy. Not for glycogen. It activates SGLT1, the sodium-glucose co-transporter in the gut wall responsible for the most efficient sodium absorption pathway in the body. Without luminal glucose, this pathway operates at a fraction of its capacity. Every gram is doing work.</p>
+          <a href="/faq/#what-is-sglt1" class="ing-faq-link">What is SGLT1, exactly? &rarr;</a>
         </div>
 
         <div class="ing-row">
@@ -739,6 +753,7 @@
             <p class="ing-name">Citric Acid</p>
           </div>
           <p class="ing-why">pH buffer and palatability agent. Masks the metallic notes from the potassium and magnesium compounds. Not here to make this taste like something, just to keep it from tasting unpleasant.</p>
+          <a href="/faq/#citric-acid-headache" class="ing-faq-link">Does this cause headaches? &rarr;</a>
         </div>
 
         <!-- Silicon Dioxide is just an anti-caking agent that shows up in
@@ -758,6 +773,7 @@
             <p class="ing-name">Luo Han Guo Extract</p>
           </div>
           <p class="ing-why">A trace amount of monk fruit extract, dosed just enough to round off citric acid's tartness and the formula's mineral notes, not to add real sweetness. Keeping it near-zero also avoids disturbing the 1:1 sodium-to-glucose ratio Dextrose Monohydrate is dosed on. This isn't a flavored product. It's a neutral one nudged just into pleasant.</p>
+          <a href="/faq/#monk-fruit-intolerance" class="ing-faq-link">Don't tolerate monk fruit well? &rarr;</a>
         </div>
 
       </div>
@@ -778,6 +794,7 @@
         <li><a href="https://instagram.com/drinkhydratonics" target="_blank">@drinkhydratonics</a></li>
         <li><a href="https://tiktok.com/@hydratonics" target="_blank">@hydratonics</a></li>
         <li><a href="https://hydratonics.com">hydratonics.com</a></li>
+        <li><a href="/faq/">FAQ</a></li>
         <li><a href="/founding/">Founding Members</a></li>
         <li><a href="/privacy/">Privacy Policy</a></li>
       </ul>
