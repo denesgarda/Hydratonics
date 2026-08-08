@@ -762,7 +762,9 @@
     .faq-list { margin-top: 24px; }
     .faq-item {
       border-top: 1px solid var(--rule);
-      scroll-margin-top: 24px;
+      /* Clears the sticky nav on jump so the question itself lands
+         visible below it, same fix as .faq-group's section anchors. */
+      scroll-margin-top: 96px;
     }
     .faq-item:last-child { border-bottom: 1px solid var(--rule); }
     .faq-item.is-target { background: rgba(91, 148, 249, 0.06); }
@@ -1299,7 +1301,7 @@
         btn.setAttribute('aria-expanded', 'true');
         openAnswer(answer);
         item.classList.add('is-target');
-        item.scrollIntoView({ block: 'center' });
+        item.scrollIntoView({ block: 'start' });
       }
       openFromHash();
       window.addEventListener('hashchange', openFromHash);
