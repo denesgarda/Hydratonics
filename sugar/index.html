@@ -874,5 +874,21 @@
     </div>
   </footer>
 
+  <script>
+    // Prefer real browser back-navigation over a hard link to "/" so the
+    // homepage restores scroll position, same as the browser's own back
+    // button. Falls back to the plain href when there's no history to
+    // return to (e.g. this page was opened directly).
+    var backlink = document.querySelector('.formula-backlink');
+    if (backlink) {
+      backlink.addEventListener('click', function (e) {
+        if (window.history.length > 1) {
+          e.preventDefault();
+          history.back();
+        }
+      });
+    }
+  </script>
+
 </body>
 </html>
