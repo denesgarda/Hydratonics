@@ -196,7 +196,7 @@
       justify-content: center;
       gap: 16px;
       flex-wrap: wrap;
-      margin-top: 48px;
+      margin-top: 8px;
     }
     .hero-cta-form-wrap { display: flex; flex-direction: column; align-items: center; }
     .hero-email-form { display: flex; }
@@ -234,6 +234,82 @@
       .hero-cta-row { flex-direction: column; align-items: stretch; }
       .hero-cta-form-wrap { align-items: stretch; }
       .hero-email-form input[type="email"] { width: auto; flex: 1; }
+    }
+
+    /* ── HERO LIVE STATUS (draft v4) ───────────────────────
+       Not a standalone widget — a one-line teaser + bar sitting in
+       its own centered column between the tagline and the CTAs, so
+       the 85% reads as "almost here, act now" rather than a project-
+       status readout competing with the CTAs. */
+    .hero-live-status-wrap {
+      width: fit-content;
+      margin: 40px auto 32px;
+    }
+    .hero-live-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--grey-dark);
+      white-space: nowrap;
+      margin-bottom: 10px;
+    }
+    .hero-live-status strong { color: var(--t1-blue); font-weight: 700; }
+    .hero-status-dot {
+      position: relative;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--t1-blue);
+      flex-shrink: 0;
+    }
+    .hero-status-dot::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: var(--t1-blue);
+      animation: hero-status-pulse 2s ease-out infinite;
+    }
+    @keyframes hero-status-pulse {
+      0%   { transform: scale(1); opacity: 0.6; }
+      100% { transform: scale(2.8); opacity: 0; }
+    }
+    /* Bar spans the exact width of the text line above it (both live
+       inside .hero-live-status-wrap, which is sized to fit-content). */
+    .hero-status-bar {
+      position: relative;
+      width: 100%;
+      height: 4px;
+      background: var(--rule);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .hero-status-fill {
+      position: relative;
+      height: 100%;
+      border-radius: 2px;
+      background: var(--t1-blue);
+      overflow: hidden;
+    }
+    .hero-status-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -60%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.85), transparent);
+      animation: hero-status-sweep 2.2s ease-in-out infinite;
+    }
+    @keyframes hero-status-sweep {
+      0%   { left: -60%; }
+      100% { left: 140%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .hero-status-dot::after { animation: none; }
+      .hero-status-fill::after { animation: none; }
     }
 
     .hero-headline {
@@ -854,6 +930,15 @@
       <img class="hero-banner-img frag-3" src="assets/hero-no-bs.png" alt="No BS." />
     </div>
     <div class="container">
+      <!-- Draft: live status teaser, leads into the CTAs -->
+      <div class="hero-live-status-wrap">
+        <p class="hero-live-status">
+          <span class="hero-status-dot"></span>
+          Tier I is <strong>85% built.</strong> Be first to know when it ships.
+        </p>
+        <div class="hero-status-bar"><div class="hero-status-fill" style="width: 85%;"></div></div>
+      </div>
+
       <div class="hero-cta-row">
         <a href="https://instagram.com/drinkhydratonics" target="_blank" class="hero-cta hero-cta-instagram">Follow on Instagram</a>
         <div class="hero-cta-form-wrap">
