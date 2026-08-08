@@ -243,6 +243,7 @@
        status readout competing with the CTAs. */
     .hero-live-status-wrap {
       width: fit-content;
+      max-width: 100%;
       margin: 40px auto 32px;
     }
     .hero-live-status {
@@ -254,6 +255,16 @@
       color: var(--grey-dark);
       white-space: nowrap;
       margin-bottom: 10px;
+    }
+    /* The one-line "nowrap" treatment only fits on wider screens —
+       on mobile the sentence is wider than the viewport, so let it
+       wrap there instead of overflowing off the right edge. */
+    @media (max-width: 600px) {
+      .hero-live-status {
+        white-space: normal;
+        align-items: flex-start;
+      }
+      .hero-status-dot { margin-top: 5px; }
     }
     .hero-live-status strong { color: var(--t1-blue); font-weight: 700; }
     .hero-status-dot {
