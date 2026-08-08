@@ -66,6 +66,12 @@
     /* ── RESET ──────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
+    /* Mobile rubber-band/momentum overscroll reveals the canvas behind
+       the document, which falls back to body's background by default
+       (light) — left as-is here so scrolling past the TOP still bounces
+       light. A script further down swaps html's background to the
+       footer's dark color only while the footer is actually in view, so
+       the BOTTOM bounce matches it instead of flashing white. */
     body {
       background: var(--white);
       color: var(--ink);
@@ -783,6 +789,22 @@
         }
       });
     }
+  </script>
+
+  <script>
+    // Rubber-band/momentum overscroll on mobile reveals html's background.
+    // Keep it light (the CSS default) while the footer is out of view,
+    // and swap it to match the footer's dark color only once the footer
+    // is actually visible — so scrolling past the TOP still bounces
+    // light, and only the BOTTOM bounce matches the footer.
+    (function () {
+      var footer = document.querySelector('footer');
+      if (!footer || !('IntersectionObserver' in window)) return;
+      var observer = new IntersectionObserver(function (entries) {
+        document.documentElement.style.background = entries[0].isIntersecting ? 'var(--ink)' : '';
+      });
+      observer.observe(footer);
+    })();
   </script>
 
 </body>
