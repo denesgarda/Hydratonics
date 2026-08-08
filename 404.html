@@ -24,6 +24,9 @@
       font-size: 16px;
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
     a { color: inherit; text-decoration: none; }
 
@@ -49,6 +52,7 @@
 
     /* ── NAV ── */
     nav {
+      flex-shrink: 0;
       padding: 20px 0;
       border-bottom: 1px solid var(--rule);
       background: rgba(255,255,255,0.95);
@@ -86,9 +90,9 @@
 
     /* ── HERO (404 content) ── */
     .hero {
+      flex: 1 0 auto; /* soaks up leftover height so the footer hugs the bottom */
       padding: 72px 0 64px;
       border-bottom: 1px solid var(--rule);
-      min-height: calc(100vh - 61px - 80px); /* fills viewport: subtract nav + footer */
     }
     .hero-eyebrow {
       font-family: var(--font-mono);
@@ -135,7 +139,7 @@
     }
 
     /* ── FOOTER (dark) ── */
-    footer { padding: 32px 0; background: var(--ink); }
+    footer { flex-shrink: 0; padding: 32px 0; background: var(--ink); }
     footer .brand-svg { filter: invert(1); }
     footer .container {
       display: flex;
@@ -206,6 +210,7 @@
         <li><a href="https://instagram.com/drinkhydratonics" target="_blank">@drinkhydratonics</a></li>
         <li><a href="https://tiktok.com/@hydratonics" target="_blank">@hydratonics</a></li>
         <li><a href="https://hydratonics.com">hydratonics.com</a></li>
+        <li><a href="/founding/">Founding Members</a></li>
         <li><a href="/privacy/">Privacy Policy</a></li>
       </ul>
     </div>
