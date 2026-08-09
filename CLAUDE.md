@@ -2,6 +2,12 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Read these too
+
+- `project_context.txt` — product, formula, business, and website history. The owner maintains this across many chats (not just Claude Code) as the durable memory of the whole project. When asked to update it: read the actual current file first, preserve all existing content unless something is specifically wrong, only change what's needed, and report every change made afterward as an explicit changelog. Never delete historical information.
+
+Open decisions, working-style preferences, and technical gotchas from past sessions are kept in Claude Code's persistent memory rather than a repo file — no separate handoff doc to check here.
+
 ## What this is
 
 A static marketing site for Hydratonics, a tiered electrolyte supplement brand. No build system, no package manager, no framework — plain HTML/CSS/JS files deployed as-is via GitHub Pages to `hydratonics.com` (see `CNAME`). There is no dev server, linter, or test suite; "running" the site means opening the HTML files directly or serving the directory statically (e.g. `python3 -m http.server`).
@@ -12,7 +18,10 @@ Each route is a self-contained `index.html` with its CSS in an inline `<style>` 
 
 - `index.html` — main landing page (hero, formula tiers, mission section [currently commented out], email signup)
 - `formula/index.html` — dedicated page detailing the product formula
-- `founding/index.html` — Founding Member invite redemption (code check → accept invite → confirmation), backed by its own Google Apps Script Web App (a Sheet of invite codes, separate from the email-signup script)
+- `sugar/index.html` — deep-dive on the SGLT1/dextrose rationale (why there's sugar in the formula)
+- `founding/index.html` — Founding Member invite redemption (code check → accept invite → confirmation), backed by its own Google Apps Script Web App (a Sheet of invite codes, separate from the email-signup script). Fully dark-themed, unlike the rest of the site, deliberately. Reference copy of its backend script lives at `founding/apps-script.gs` (not executed by the site — the real deployment is in the owner's Google account).
+- `faq/index.html` — FAQ, sectioned (Ingredients & Safety / What Sets This Apart / Using It), accordion UI, deep-linkable by URL hash to individual questions or whole sections
+- `privacy/index.html` — privacy policy, audited against actual data collection (not generic boilerplate)
 - `landing/01/index.html` — an alternate/variant landing page (numbered so more variants can be added, e.g. `landing/02/`)
 - `feedback/01/`, `feedback/02/`, `feedback/03/` — sequential taste-feedback survey pages; each is a snapshot for a round of testing, kept rather than overwritten so past surveys stay reproducible. When asked to make a new feedback form, copy the most recent numbered folder into the next number rather than editing an old one.
 - `404.html` — GitHub Pages custom 404
