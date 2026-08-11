@@ -1110,7 +1110,7 @@
     /* top:0 — the line-track above already reserves a fixed 20px trailing
        buffer below the Hydratonics line's end, which serves as this
        section's entire "space above the heading." */
-    padding: 0 0 60px;
+    padding-bottom: 60px;
     text-align: center;
   }
   .harmony-heading {
@@ -1183,11 +1183,12 @@
   }
 
   .solution-section {
-    padding: 0 0 40px;
+    padding-bottom: 40px;
     display: flex;
     justify-content: center;
   }
   .solution-graphic {
+    position: relative;
     width: 100%;
     max-width: 640px;
   }
@@ -1197,6 +1198,66 @@
     height: auto;
   }
   .solution-section { border-bottom: 1px solid var(--rule); }
+
+  /* ── SOLUTION GRAPHIC INFO TOGGLE ───────────────────────── */
+  /* Hover/focus reveal it for free via CSS (desktop); a small JS handler
+     below adds tap-to-toggle with tap-outside-to-close for mobile, where
+     :hover doesn't behave like a real toggle. */
+  .solution-info {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 2;
+  }
+  .solution-info-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1px solid var(--grey-light);
+    background: var(--white);
+    color: var(--grey-mid);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .solution-info-toggle:hover,
+  .solution-info-toggle:focus-visible {
+    border-color: var(--ink);
+    color: var(--ink);
+  }
+  .solution-info-panel {
+    position: absolute;
+    top: 30px;
+    right: 0;
+    width: 260px;
+    max-width: calc(100vw - 40px);
+    padding: 14px 16px;
+    background: var(--white);
+    border: 1px solid var(--rule);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    font-family: var(--font-body);
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--grey-dark);
+    text-align: left;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+  }
+  .solution-info:hover .solution-info-panel,
+  .solution-info:focus-within .solution-info-panel,
+  .solution-info.is-open .solution-info-panel {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  @media (max-width: 600px) {
+    .solution-info { top: 8px; right: 8px; }
+  }
 
 
   </style>
@@ -1768,6 +1829,14 @@
 
   <section class="container solution-section">
     <div class="solution-graphic">
+      <div class="solution-info">
+        <button type="button" class="solution-info-toggle" aria-expanded="false" aria-describedby="solution-info-panel">?</button>
+        <div class="solution-info-panel" id="solution-info-panel" role="tooltip">
+          Every ion and molecule shown here is an actual component of the formula. Glycine comes from Magnesium Glycinate. Citrate comes from Potassium Citrate, while Citric Acid is a separate ingredient added as a pH buffer. Lactate comes from Calcium Lactate. Mogrosides come from Luo Han Guo (monk fruit) extract.
+          <br /><br />
+          Tap or hover any piece to see its name in the center.
+        </div>
+      </div>
       <svg
          width="119.12814mm"
          height="77.917507mm"
@@ -2667,6 +2736,31 @@
   measure();
   if (!reduceMotion) update();
 })();
+</script>
+
+<script>
+  // Solution graphic info toggle: hover/focus already reveal it via pure CSS
+  // (:hover, :focus-within), which covers desktop for free. Touch devices
+  // don't have a real hover state, so this adds an explicit tap-to-toggle,
+  // plus tap-outside-to-close so it doesn't just stay stuck open.
+  (function () {
+    var wrap = document.querySelector('.solution-info');
+    var toggle = document.querySelector('.solution-info-toggle');
+    if (!wrap || !toggle) return;
+
+    toggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var isOpen = wrap.classList.toggle('is-open');
+      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!wrap.contains(e.target)) {
+        wrap.classList.remove('is-open');
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+  })();
 </script>
 
 </body>
