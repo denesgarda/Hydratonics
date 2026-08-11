@@ -246,6 +246,9 @@
     font-size: 24px;
     color: var(--ink);
   }
+  @media (max-width: 600px) {
+    .harmony-heading { font-size: 19px; }
+  }
 
   /* Auto-scrolling card carousel — deliberately width-independent: it never
      needs to fit its content within the viewport, it just loops, so none of
@@ -633,6 +636,25 @@
     diagram.style.transformOrigin = laneX[5] + 'px top';
     diagram.style.transform = diagramScale < 1 ? 'scale(' + diagramScale + ')' : '';
     currentScale = diagramScale;
+
+    // transform: scale() shrinks the diagram visually but its LAYOUT height
+    // (which is what determines where the harmony section starts) stays at
+    // the full unscaled size — CSS transforms don't affect layout, only
+    // rendering. Without this, the visible end of the Hydratonics line moves
+    // up as diagramScale shrinks (transform-origin is at the top), while the
+    // reserved space below it doesn't, opening a growing gap on narrow
+    // screens. Pull that unused space back with a negative margin sized to
+    // exactly what scaling removed.
+    //
+    // Measure diagram.offsetHeight, not diagramSection's — .brand-row's
+    // 100px top margin collapses through .diagram (which has no padding/
+    // border to stop it) and lands in #diagramSection's own box instead
+    // (which does stop it there, via overflow-x:hidden establishing a new
+    // block formatting context). That 100px therefore sits outside what the
+    // transform actually scales; using the section's full height overcounts
+    // it and overcorrects the margin.
+    var naturalHeight = diagram.offsetHeight;
+    diagramSection.style.marginBottom = (naturalHeight * (diagramScale - 1)) + 'px';
 
     // The left side (lanes + callouts) is what sets diagramScale/padding above —
     // checkpoint text doesn't get a say in that. Instead, once the left side is
