@@ -235,9 +235,9 @@
 
   .harmony-section {
     /* top:0 — the line-track above already reserves a fixed 20px trailing
-       buffer below the Hydratonics line's end, which serves as this section's
-       entire "space above the heading," matching the 20px used below it. */
-    padding: 0 40px 140px;
+       buffer below the Hydratonics line's end, which serves as this
+       section's entire "space above the heading." */
+    padding: 0 0 140px;
     text-align: center;
   }
   .harmony-heading {
@@ -246,26 +246,52 @@
     font-size: 24px;
     color: var(--ink);
   }
-  .harmony-trunk {
-    width: 4.2px; /* matches the race lines' stroke weight, for the same trunk-to-line continuity */
-    height: 90px;
-    background: var(--t1-blue);
-    margin: 20px auto 72px;
+
+  /* Auto-scrolling card carousel — deliberately width-independent: it never
+     needs to fit its content within the viewport, it just loops, so none of
+     the responsive fitting problems a fixed layout has even apply here. */
+  .harmony-carousel {
+    margin-top: 20px; /* matches the 20px gap above the heading (line-track's trailing buffer) */
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to right, transparent, black 60px, black calc(100% - 60px), transparent);
+    mask-image: linear-gradient(to right, transparent, black 60px, black calc(100% - 60px), transparent);
   }
-  .harmony-branches {
+  .harmony-track {
     display: flex;
-    justify-content: center;
-    gap: 56px;
-    flex-wrap: wrap;
+    width: max-content;
+    animation: harmony-scroll 26s linear infinite;
   }
-  .harmony-branch {
+  @media (prefers-reduced-motion: reduce) {
+    .harmony-track { animation: none; }
+  }
+  @keyframes harmony-scroll {
+    from { transform: translateX(0); }
+    /* Exactly one set's width (4 cards × 240px footprint), not a percentage —
+       a percentage of the *total* track breaks the moment the copy count
+       changes, since it's no longer "half" once there are more than 2 copies. */
+    to { transform: translateX(-960px); }
+  }
+  .harmony-card {
+    flex: 0 0 auto;
+    width: 220px;
+    margin-right: 20px; /* every card carries its own trailing gap (not flex `gap`, which
+                            wouldn't add one after the last card) — keeps each card's full
+                            footprint (width + gap) perfectly uniform, so each duplicated set
+                            is exactly the same width and the loop lands exactly on a card boundary */
+    padding: 28px 22px;
+    border: 1px solid var(--rule);
+    display: flex; /* centers the text vertically — cards stretch to a shared
+                       height (flex default in .harmony-track), but shorter
+                       text would otherwise sit flush at the top of that space */
+    align-items: center;
+    justify-content: center;
     font-family: var(--font-mono);
     font-size: 13px;
     font-weight: 500;
     letter-spacing: 0.02em;
     text-transform: uppercase;
     line-height: 1.6;
-    max-width: 160px;
+    text-align: center;
   }
 
   .scroll-spacer { height: 80vh; }
@@ -312,13 +338,32 @@
   </section>
 
   <section class="container harmony-section">
-    <p class="harmony-heading">in perfect harmony with</p>
-    <div class="harmony-trunk"></div>
-    <div class="harmony-branches">
-      <div class="harmony-branch">Intentional dosing calculations</div>
-      <div class="harmony-branch">Best ingredient forms</div>
-      <div class="harmony-branch">Ideal osmolality for absorption</div>
-      <div class="harmony-branch">Nothing here by default</div>
+    <p class="harmony-heading">in perfect harmony with...</p>
+    <div class="harmony-carousel">
+      <!-- 4 copies of the same 4 cards, back to back. Looping by exactly one
+           copy's width (960px, see @keyframes) is what makes it seamless; the
+           extra copies beyond 2 exist so the visible (masked) window is never
+           wider than the untraveled track ahead of it — with only 2 copies,
+           the window could outrun the track near the end of each cycle and
+           expose blank space just before the snap-back, reading as a jump. -->
+      <div class="harmony-track" id="harmonyTrack">
+        <div class="harmony-card">Intentional dosing calculations</div>
+        <div class="harmony-card">Best ingredient forms</div>
+        <div class="harmony-card">Ideal osmolality for absorption</div>
+        <div class="harmony-card">Nothing here by default</div>
+        <div class="harmony-card" aria-hidden="true">Intentional dosing calculations</div>
+        <div class="harmony-card" aria-hidden="true">Best ingredient forms</div>
+        <div class="harmony-card" aria-hidden="true">Ideal osmolality for absorption</div>
+        <div class="harmony-card" aria-hidden="true">Nothing here by default</div>
+        <div class="harmony-card" aria-hidden="true">Intentional dosing calculations</div>
+        <div class="harmony-card" aria-hidden="true">Best ingredient forms</div>
+        <div class="harmony-card" aria-hidden="true">Ideal osmolality for absorption</div>
+        <div class="harmony-card" aria-hidden="true">Nothing here by default</div>
+        <div class="harmony-card" aria-hidden="true">Intentional dosing calculations</div>
+        <div class="harmony-card" aria-hidden="true">Best ingredient forms</div>
+        <div class="harmony-card" aria-hidden="true">Ideal osmolality for absorption</div>
+        <div class="harmony-card" aria-hidden="true">Nothing here by default</div>
+      </div>
     </div>
   </section>
 
