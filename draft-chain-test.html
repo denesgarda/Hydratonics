@@ -233,6 +233,41 @@
     max-width: 440px;
   }
 
+  .harmony-section {
+    /* top:0 — the line-track above already reserves a fixed 20px trailing
+       buffer below the Hydratonics line's end, which serves as this section's
+       entire "space above the heading," matching the 20px used below it. */
+    padding: 0 40px 140px;
+    text-align: center;
+  }
+  .harmony-heading {
+    font-family: var(--font-body);
+    font-style: italic;
+    font-size: 24px;
+    color: var(--ink);
+  }
+  .harmony-trunk {
+    width: 4.2px; /* matches the race lines' stroke weight, for the same trunk-to-line continuity */
+    height: 90px;
+    background: var(--t1-blue);
+    margin: 20px auto 72px;
+  }
+  .harmony-branches {
+    display: flex;
+    justify-content: center;
+    gap: 56px;
+    flex-wrap: wrap;
+  }
+  .harmony-branch {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    line-height: 1.6;
+    max-width: 160px;
+  }
+
   .scroll-spacer { height: 80vh; }
 
 </style>
@@ -276,6 +311,17 @@
     </div>
   </section>
 
+  <section class="container harmony-section">
+    <p class="harmony-heading">in perfect harmony with</p>
+    <div class="harmony-trunk"></div>
+    <div class="harmony-branches">
+      <div class="harmony-branch">Intentional dosing calculations</div>
+      <div class="harmony-branch">Best ingredient forms</div>
+      <div class="harmony-branch">Ideal osmolality for absorption</div>
+      <div class="harmony-branch">Nothing here by default</div>
+    </div>
+  </section>
+
   <div class="scroll-spacer"></div>
 
 <script>
@@ -304,11 +350,16 @@
     },
     {
       title: 'Precise 1:1 molar ratio',
-      desc: 'Glucose dosed 1:1 with sodium, capped at 30mmol/L — not guessed.',
+      desc: 'Glucose dosed 1:1 with sodium — the exact ORS-derived target, not guessed.',
       deaths: [
         { lane: 'nuun', brand: 'Nuun', reason: 'undershoots the ratio, too dilute.' },
         { lane: 'powerade', brand: 'Powerade', reason: 'overshoots ~5x, mostly wasted sugar.' }
       ]
+    },
+    {
+      title: 'Capped at 30mmol/L',
+      desc: 'No more glucose than SGLT1 can actually use — every gram is working.',
+      deaths: []
     }
   ];
 
@@ -331,6 +382,8 @@
   // after the last checkpoint before the terminal length, for the payoff
   // beat where only the Hydratonics line is still on screen.
   var MARK_Y0 = 70, CHECKPOINT_GAP = 160, DOT_OFFSET = 20, TRAIL = 160;
+  var TRACK_TRAILING_BUFFER = 20; // space below the line's end reserved inside line-track itself —
+                                   // this plus .harmony-section's own top padding is the gap above "in perfect harmony with"
   CHECKPOINTS.forEach(function (cp, ci) {
     cp.markY = MARK_Y0 + ci * CHECKPOINT_GAP;
     cp.dotY = cp.markY + DOT_OFFSET;
@@ -397,7 +450,7 @@
       cp.el = block;
     });
 
-    lineTrack.style.height = (MAX_LEN + 40) + 'px';
+    lineTrack.style.height = (MAX_LEN + TRACK_TRAILING_BUFFER) + 'px';
   }
   buildDiagram();
 
