@@ -259,17 +259,17 @@
   .harmony-track {
     display: flex;
     width: max-content;
-    animation: harmony-scroll 26s linear infinite;
+    animation: harmony-scroll 32.5s linear infinite; /* scaled up from 26s so px/sec speed matches the old 4-card, 960px loop */
   }
   @media (prefers-reduced-motion: reduce) {
     .harmony-track { animation: none; }
   }
   @keyframes harmony-scroll {
     from { transform: translateX(0); }
-    /* Exactly one set's width (4 cards × 240px footprint), not a percentage —
+    /* Exactly one set's width (5 cards × 240px footprint), not a percentage —
        a percentage of the *total* track breaks the moment the copy count
        changes, since it's no longer "half" once there are more than 2 copies. */
-    to { transform: translateX(-960px); }
+    to { transform: translateX(-1200px); }
   }
   .harmony-card {
     flex: 0 0 auto;
@@ -340,29 +340,33 @@
   <section class="container harmony-section">
     <p class="harmony-heading">in perfect harmony with...</p>
     <div class="harmony-carousel">
-      <!-- 4 copies of the same 4 cards, back to back. Looping by exactly one
-           copy's width (960px, see @keyframes) is what makes it seamless; the
+      <!-- 4 copies of the same 5 cards, back to back. Looping by exactly one
+           copy's width (1200px, see @keyframes) is what makes it seamless; the
            extra copies beyond 2 exist so the visible (masked) window is never
            wider than the untraveled track ahead of it — with only 2 copies,
            the window could outrun the track near the end of each cycle and
            expose blank space just before the snap-back, reading as a jump. -->
       <div class="harmony-track" id="harmonyTrack">
-        <div class="harmony-card">Intentional dosing calculations</div>
-        <div class="harmony-card">Best ingredient forms</div>
-        <div class="harmony-card">Ideal osmolality for absorption</div>
-        <div class="harmony-card">Nothing here by default</div>
-        <div class="harmony-card" aria-hidden="true">Intentional dosing calculations</div>
-        <div class="harmony-card" aria-hidden="true">Best ingredient forms</div>
-        <div class="harmony-card" aria-hidden="true">Ideal osmolality for absorption</div>
-        <div class="harmony-card" aria-hidden="true">Nothing here by default</div>
-        <div class="harmony-card" aria-hidden="true">Intentional dosing calculations</div>
-        <div class="harmony-card" aria-hidden="true">Best ingredient forms</div>
-        <div class="harmony-card" aria-hidden="true">Ideal osmolality for absorption</div>
-        <div class="harmony-card" aria-hidden="true">Nothing here by default</div>
-        <div class="harmony-card" aria-hidden="true">Intentional dosing calculations</div>
-        <div class="harmony-card" aria-hidden="true">Best ingredient forms</div>
-        <div class="harmony-card" aria-hidden="true">Ideal osmolality for absorption</div>
-        <div class="harmony-card" aria-hidden="true">Nothing here by default</div>
+        <div class="harmony-card">Every ingredient's specific form</div>
+        <div class="harmony-card">Magnesium's deliberately flat dose</div>
+        <div class="harmony-card">Potassium's twofold dose</div>
+        <div class="harmony-card">Citric acid's dual purpose</div>
+        <div class="harmony-card">Every ingredient's shared osmolality</div>
+        <div class="harmony-card" aria-hidden="true">Every ingredient's specific form</div>
+        <div class="harmony-card" aria-hidden="true">Magnesium's deliberately flat dose</div>
+        <div class="harmony-card" aria-hidden="true">Potassium's twofold dose</div>
+        <div class="harmony-card" aria-hidden="true">Citric acid's dual purpose</div>
+        <div class="harmony-card" aria-hidden="true">Every ingredient's shared osmolality</div>
+        <div class="harmony-card" aria-hidden="true">Every ingredient's specific form</div>
+        <div class="harmony-card" aria-hidden="true">Magnesium's deliberately flat dose</div>
+        <div class="harmony-card" aria-hidden="true">Potassium's twofold dose</div>
+        <div class="harmony-card" aria-hidden="true">Citric acid's dual purpose</div>
+        <div class="harmony-card" aria-hidden="true">Every ingredient's shared osmolality</div>
+        <div class="harmony-card" aria-hidden="true">Every ingredient's specific form</div>
+        <div class="harmony-card" aria-hidden="true">Magnesium's deliberately flat dose</div>
+        <div class="harmony-card" aria-hidden="true">Potassium's twofold dose</div>
+        <div class="harmony-card" aria-hidden="true">Citric acid's dual purpose</div>
+        <div class="harmony-card" aria-hidden="true">Every ingredient's shared osmolality</div>
       </div>
     </div>
   </section>
