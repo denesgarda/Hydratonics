@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DRAFT — Centered + Responsive Pitch</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,500;1,400&family=STIX+Two+Text:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet" />
+<style>
+
+  @font-face {
+    font-family: 'Avenir';
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+    src: url('fonts/avenir-ultra-bold.woff2') format('woff2');
+  }
+
+  :root {
+    --white:       #ffffff;
+    --ink:         #1a1a1a;
+    --grey-dark:   #555555;
+    --grey-mid:    #888888;
+    --grey-light:  #cccccc;
+    --rule:        #e0e0e0;
+    --t1-blue:     rgba(91, 148, 249, 1);
+    --fail-red:    #d64545;
+
+    --font-display: 'Avenir', 'Avenir Next', 'Franklin Gothic Heavy', 'Arial Black', sans-serif;
+    --font-body:    'STIX Two Text', Georgia, serif;
+    --font-mono:    'DM Mono', 'Courier New', monospace;
+
+    --max-w: 1240px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--white);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: var(--max-w); margin: 0 auto; padding: 0 40px; }
+
+  /* transform: scale() shrinks the diagram visually but its layout box stays
+     natural size — clip so that doesn't force a horizontal scrollbar. */
+  #diagramSection { overflow-x: hidden; }
+
+  .draft-bar {
+    background: var(--ink);
+    color: var(--white);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 10px;
+  }
+
+  .intro { padding: 88px 0 40px; }
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--grey-mid);
+    margin-bottom: 28px;
+  }
+  .section-title {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 32px;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    max-width: 620px;
+  }
+
+  /* ── DIAGRAM: the Hydratonics line (not the block's bounding box) is
+     always pinned to the horizontal center — margin-left is computed in JS
+     from its actual lane position, not auto-centering the whole block,
+     since checkpoint text on the right would otherwise pull the "visible"
+     center off from where Hydratonics actually sits.
+     width: max-content (not fit-content) so the checkpoint text sizes to its
+     own natural width instead of being squeezed by the narrow container —
+     any resulting overflow is handled visually via #diagramSection's
+     overflow-x: hidden + the JS transform: scale() fallback. */
+  .diagram { width: max-content; }
+
+  .brand-row {
+    position: relative;
+    height: 140px;
+    margin: 100px 0 8px 0;
+  }
+  .brand-label {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 16px;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    color: var(--ink);
+    white-space: nowrap;
+    line-height: 1;
+    transform: rotate(-45deg);
+    transform-origin: left bottom;
+  }
+  .brand-label[data-lane="hydratonics"] { color: var(--t1-blue); }
+
+  .diagram-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .line-track {
+    position: relative;
+    flex-shrink: 0;
+    height: 320px; /* explicit — absolutely-positioned children don't otherwise contribute to layout height */
+  }
+  .line {
+    position: absolute;
+    top: 0;
+    width: 4.2px;
+    height: 0;
+    background: var(--ink);
+    transform: translateX(-2.1px);
+  }
+  .line[data-lane="hydratonics"] { background: var(--t1-blue); }
+
+  .mark {
+    position: absolute;
+    top: 70px;
+    width: 23px;
+    height: 23px;
+    transform: translate(-11.5px, -11.5px) scale(0);
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
+  }
+  .mark.is-visible {
+    opacity: 1;
+    transform: translate(-11.5px, -11.5px) scale(1);
+  }
+  .mark::before, .mark::after {
+    content: '';
+    position: absolute;
+    top: 9.4px;
+    left: 0;
+    width: 23px;
+    height: 4.2px;
+    background: var(--fail-red);
+  }
+  .mark::before { transform: rotate(45deg); }
+  .mark::after  { transform: rotate(-45deg); }
+
+  .dot {
+    position: absolute;
+    top: 90px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--ink);
+    transform: translate(-6px, -6px) scale(0);
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
+  }
+  .dot.is-visible {
+    opacity: 1;
+    transform: translate(-6px, -6px) scale(1);
+  }
+  .dot[data-lane="hydratonics"] { background: var(--t1-blue); }
+
+  .fail-line {
+    position: absolute;
+    height: 1px;
+    background: var(--grey-light);
+    transform-origin: left center;
+    /* rotation set in JS — varies between 135deg (the old fixed 45°) and 90deg (vertical) */
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+  .fail-line.is-visible { opacity: 1; }
+
+  .fail-text {
+    position: absolute;
+    width: 180px;
+    text-align: right;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--grey-mid);
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+  .fail-text.is-visible { opacity: 1; }
+  .fail-text-brand { color: var(--ink); font-weight: 500; }
+
+  .checkpoint {
+    padding-top: 79px; /* centers checkpoint-head's line-height:1 row on the dot at top:90px */
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+  .checkpoint.is-visible { opacity: 1; }
+  .checkpoint-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    line-height: 1;
+  }
+  .checkpoint-dash {
+    color: var(--grey-light);
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 22px;
+  }
+  .checkpoint-title {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+  }
+  .checkpoint-desc {
+    font-family: var(--font-body);
+    color: var(--grey-dark);
+    font-size: 15px;
+    margin-top: 6px;
+    margin-left: 34px;
+    max-width: 440px;
+  }
+
+  .scroll-spacer { height: 80vh; }
+
+</style>
+</head>
+<body>
+
+  <div class="draft-bar">Draft preview — centered + responsive lane pitch</div>
+
+  <section class="intro">
+    <div class="container">
+      <p class="section-label">The Big Idea</p>
+      <h2 class="section-title">Every decision here creates the next one.</h2>
+    </div>
+  </section>
+
+  <section class="container" id="diagramSection">
+    <div class="diagram" id="diagram">
+
+      <div class="brand-row" id="brandRow">
+        <span class="brand-label" data-lane="liquidiv">Liquid I.V.</span>
+        <span class="brand-label" data-lane="gatorade">Gatorade</span>
+        <span class="brand-label" data-lane="lmnt">LMNT</span>
+        <span class="brand-label" data-lane="nuun">Nuun</span>
+        <span class="brand-label" data-lane="powerade">Powerade</span>
+        <span class="brand-label" data-lane="hydratonics">Hydratonics</span>
+      </div>
+
+      <div class="diagram-row">
+        <div class="line-track" id="lineTrack">
+          <div class="line" data-lane="liquidiv"></div>
+          <div class="line" data-lane="gatorade"></div>
+          <div class="line" data-lane="lmnt"></div>
+          <div class="line" data-lane="nuun"></div>
+          <div class="line" data-lane="powerade"></div>
+          <div class="line" data-lane="hydratonics"></div>
+
+          <div class="mark" data-lane="liquidiv"></div>
+          <div class="mark" data-lane="gatorade"></div>
+
+          <div class="fail-line" data-lane="liquidiv"></div>
+          <div class="fail-text" data-lane="liquidiv"><span class="fail-text-brand">Liquid I.V.</span> — no magnesium in the formula.</div>
+
+          <div class="fail-line" data-lane="gatorade"></div>
+          <div class="fail-text" data-lane="gatorade"><span class="fail-text-brand">Gatorade</span> — no magnesium, no calcium.</div>
+
+          <div class="dot" data-lane="lmnt"></div>
+          <div class="dot" data-lane="nuun"></div>
+          <div class="dot" data-lane="powerade"></div>
+          <div class="dot" data-lane="hydratonics"></div>
+        </div>
+
+        <div class="checkpoint" id="checkpoint1">
+          <div class="checkpoint-head">
+            <span class="checkpoint-dash">—</span>
+            <span class="checkpoint-title">Real electrolyte panel</span>
+          </div>
+          <p class="checkpoint-desc">Sodium, potassium, and magnesium — not just sodium.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="scroll-spacer"></div>
+
+<script>
+(function () {
+  var LANES = ['liquidiv', 'gatorade', 'lmnt', 'nuun', 'powerade', 'hydratonics'];
+  var CAPS = { liquidiv: 70, gatorade: 70 };
+  var DOT_Y = 90;
+  var MARK_Y = 70;
+  var MAX_LEN = 300;
+
+  var NATURAL_PITCH = 50, MIN_PITCH = 30; // pushed lower than the diagonal callouts would ideally like —
+                                           // they may start crowding at the tightest widths
+  var CALLOUT_RATIO = 5.2; // callout zone width, as a multiple of pitch — matches the diagonal callouts' fixed reach
+  var CHECKPOINT_MIN = 220;
+
+  var diagramSection = document.getElementById('diagramSection');
+  var diagram = document.getElementById('diagram');
+  var brandRow = document.getElementById('brandRow');
+  var lineTrack = document.getElementById('lineTrack');
+  var checkpoint1 = document.getElementById('checkpoint1');
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var brandLabels = Array.prototype.slice.call(brandRow.querySelectorAll('.brand-label'));
+  var lines = Array.prototype.slice.call(lineTrack.querySelectorAll('.line'));
+  var marks = Array.prototype.slice.call(lineTrack.querySelectorAll('.mark'));
+  var dots = Array.prototype.slice.call(lineTrack.querySelectorAll('.dot'));
+  var failLines = Array.prototype.slice.call(lineTrack.querySelectorAll('.fail-line'));
+  var failTexts = Array.prototype.slice.call(lineTrack.querySelectorAll('.fail-text'));
+
+  var trackTop = 0;
+  var currentScale = 1; // last-resort whole-diagram scale factor, set by computeLayout, read by update()
+
+  function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+
+  function computeLayout() {
+    var LABEL_OVERFLOW = 100; // room for "Hydratonics" rotated -45°, swinging right of its own anchor
+    var GAP = 14, SAFE_MARGIN = 0;
+    var TEXT_GAP = 5, TEXT_W = 180, FONT_SIZE = 11; // fail-text's base (unshrunk) box width + font size
+    var MIN_FONT_SCALE = 0.7; // once the line is fully vertical, this is as far as text alone will shrink
+    var BASE_PADDING = 40, MIN_PADDING = 0; // side padding scales down together with diagramScale
+    var specs = [
+      { lane: 'liquidiv', reach: 14 + 45 },
+      { lane: 'gatorade', reach: 14 + 120 }
+    ];
+
+    var available, pitch, laneX, diagramMarginLeft, computed, fontScale, diagramScale;
+
+    // Everything the diagram needs — pitch, the leader-line geometry, the
+    // font/box shrink, and the last-resort whole-diagram scale. Pulled into
+    // its own step because padding (below) both depends on its result
+    // (diagramScale) and feeds into it (via available width), so it has to
+    // run more than once per layout pass.
+    function solve() {
+      available = diagramSection.clientWidth - padding * 2;
+      pitch = clamp((available - 16 - 12 - CHECKPOINT_MIN - LABEL_OVERFLOW) / (CALLOUT_RATIO + 5), MIN_PITCH, NATURAL_PITCH);
+      var calloutZone = pitch * CALLOUT_RATIO;
+      laneX = LANES.map(function (_, i) { return calloutZone + i * pitch; });
+
+      // Pin the Hydratonics line itself to the horizontal center, not the
+      // diagram block's bounding box (checkpoint text on the right would
+      // otherwise pull the visible "center" off to one side).
+      diagramMarginLeft = available / 2 - laneX[5];
+
+      // Diagonal leader lines. Each has a fixed "reach" (gap + length) and a
+      // fixed vertical drop derived from it at the natural 45°, so the two
+      // callouts keep their stacked spacing no matter what. Normally they sit
+      // at 45°. But once the natural endpoint would drift within SAFE_MARGIN
+      // of the screen edge, the endpoint's X gets pinned there instead, and
+      // the line steepens — up to fully vertical — to keep reaching it as the
+      // mark itself keeps moving left with the shrinking pitch. If even that
+      // (plus the floor font size) isn't enough, diagramScale picks up the rest.
+      computed = [];
+      fontScale = 1;
+      diagramScale = 1;
+      specs.forEach(function (spec) {
+        var markX = laneX[LANES.indexOf(spec.lane)];
+        var yDrop = spec.reach * Math.SQRT1_2; // == reach * sin(45deg) == reach * cos(45deg)
+
+        var naturalX = markX - yDrop;
+        var onscreenNaturalTextLeft = diagramMarginLeft + naturalX - TEXT_GAP - TEXT_W;
+        var targetX = onscreenNaturalTextLeft < SAFE_MARGIN
+          ? (SAFE_MARGIN + TEXT_GAP + TEXT_W - diagramMarginLeft)
+          : naturalX;
+
+        var dx = clamp(markX - targetX, 0, yDrop); // 0 = vertical, yDrop = the natural 45° case
+        var dy = yDrop;
+
+        var availableW = diagramMarginLeft + markX - TEXT_GAP - SAFE_MARGIN; // width budget, fully vertical
+        var rawFontRatio = availableW / TEXT_W;
+        fontScale = Math.min(fontScale, clamp(rawFontRatio, MIN_FONT_SCALE, 1));
+
+        if (rawFontRatio < MIN_FONT_SCALE) {
+          // Even the floor font size overflows — find the scale that would pull
+          // the floor-sized text box back to the safe margin, measured as a
+          // reach from the Hydratonics anchor (laneX[5]), since that's the
+          // point the whole diagram scales around.
+          var neededReach = (laneX[5] - markX) + TEXT_GAP + TEXT_W * MIN_FONT_SCALE;
+          var candidateScale = (available / 2 - SAFE_MARGIN) / neededReach;
+          diagramScale = Math.min(diagramScale, candidateScale);
+        }
+
+        computed.push({ spec: spec, markX: markX, dx: dx, dy: dy });
+      });
+      diagramScale = Math.max(diagramScale, 0.001); // numerical safety only, not a design floor
+    }
+
+    // padding <-> diagramScale are circular (padding sets available width,
+    // which sets diagramScale, which should in turn shrink padding), so
+    // settle it with a few fixed-point passes rather than solving in closed form.
+    var padding = parseFloat(getComputedStyle(diagramSection).paddingLeft) || BASE_PADDING;
+    for (var i = 0; i < 6; i++) {
+      solve();
+      padding = MIN_PADDING + (BASE_PADDING - MIN_PADDING) * Math.pow(diagramScale, 6);
+    }
+    diagramSection.style.paddingLeft = padding + 'px';
+    diagramSection.style.paddingRight = padding + 'px';
+
+    brandLabels.forEach(function (el, i) { el.style.left = laneX[i] + 'px'; });
+    lines.forEach(function (el) { el.style.left = laneX[LANES.indexOf(el.getAttribute('data-lane'))] + 'px'; });
+    marks.forEach(function (el) { el.style.left = laneX[LANES.indexOf(el.getAttribute('data-lane'))] + 'px'; });
+    dots.forEach(function (el) { el.style.left = laneX[LANES.indexOf(el.getAttribute('data-lane'))] + 'px'; });
+    lineTrack.style.width = (laneX[5] + 16) + 'px';
+
+    diagram.style.marginLeft = diagramMarginLeft + 'px';
+    diagram.style.transformOrigin = laneX[5] + 'px top';
+    diagram.style.transform = diagramScale < 1 ? 'scale(' + diagramScale + ')' : '';
+    currentScale = diagramScale;
+
+    // The left side (lanes + callouts) is what sets diagramScale/padding above —
+    // checkpoint text doesn't get a say in that. Instead, once the left side is
+    // settled, give the checkpoint text whatever room is left up to the same
+    // safe margin on the right, and let it wrap there rather than at a fixed
+    // width. 28 = 16 (lineTrack's own trailing margin) + 12 (flex gap) between
+    // lineTrack and checkpoint.
+    // Constrain the whole .checkpoint block, not just the description — the
+    // title row (dash + "Real electrolyte panel" at 22px) can otherwise be
+    // wider than the description needs and become the thing that actually
+    // pokes past the margin, since it's what determines checkpoint's rendered width.
+    var checkpointMaxWidth = (available / 2 - SAFE_MARGIN) / diagramScale - 28;
+    checkpoint1.style.width = clamp(checkpointMaxWidth, 80, 440) + 'px';
+
+    // Apply the leader-line geometry + the shared font/box shrink. Shrinking
+    // the box width moves its LEFT edge inward while its right edge (anchored
+    // near the line's endpoint) stays put, so this is always safe to apply
+    // uniformly even to a callout that didn't strictly need it.
+    var scaledTextW = TEXT_W * fontScale;
+    var scaledFontSize = FONT_SIZE * fontScale;
+    computed.forEach(function (c) {
+      var markX = c.markX, dx = c.dx, dy = c.dy;
+      var p2x = markX - dx, p2y = MARK_Y + dy;
+      var angleDeg = Math.atan2(dy, -dx) * 180 / Math.PI; // 135 = the old fixed 45°-down-left, 90 = vertical
+
+      var segLen = Math.sqrt(dx * dx + dy * dy);
+      var p1x = markX - GAP * (dx / segLen), p1y = MARK_Y + GAP * (dy / segLen);
+      var lineLen = segLen - GAP;
+
+      var lineEl = failLines.filter(function (e) { return e.getAttribute('data-lane') === c.spec.lane; })[0];
+      var textEl = failTexts.filter(function (e) { return e.getAttribute('data-lane') === c.spec.lane; })[0];
+      lineEl.style.left = p1x + 'px';
+      lineEl.style.top = p1y + 'px';
+      lineEl.style.width = lineLen + 'px';
+      lineEl.style.transform = 'rotate(' + angleDeg + 'deg)';
+      textEl.style.left = (p2x - TEXT_GAP - scaledTextW) + 'px';
+      textEl.style.top = p2y + 'px';
+      textEl.style.width = scaledTextW + 'px';
+      textEl.style.fontSize = scaledFontSize + 'px';
+      textEl.style.transform = 'translateY(-50%)';
+    });
+  }
+
+  function measure() {
+    computeLayout();
+    var rect = lineTrack.getBoundingClientRect();
+    trackTop = rect.top + window.scrollY;
+  }
+
+  function applyState(progressPx) {
+    lines.forEach(function (line) {
+      var lane = line.getAttribute('data-lane');
+      var cap = CAPS.hasOwnProperty(lane) ? CAPS[lane] : MAX_LEN;
+      line.style.height = Math.min(progressPx, cap) + 'px';
+    });
+    marks.forEach(function (mark) {
+      var lane = mark.getAttribute('data-lane');
+      mark.classList.toggle('is-visible', progressPx >= CAPS[lane]);
+    });
+    dots.forEach(function (dot) { dot.classList.toggle('is-visible', progressPx >= DOT_Y); });
+    failLines.forEach(function (el) { el.classList.toggle('is-visible', progressPx >= DOT_Y); });
+    failTexts.forEach(function (el) { el.classList.toggle('is-visible', progressPx >= DOT_Y); });
+    checkpoint1.classList.toggle('is-visible', progressPx >= DOT_Y);
+  }
+
+  var ticking = false;
+  function onScroll() {
+    if (!ticking) { requestAnimationFrame(update); ticking = true; }
+  }
+  function update() {
+    ticking = false;
+    var viewportCenterDoc = window.scrollY + window.innerHeight / 2;
+    var rawPx = Math.max(viewportCenterDoc - trackTop, 0); // real screen-space scroll delta
+    // Convert to local (pre-scale) space before using it as a local CSS height —
+    // otherwise growth happens at scale² instead of scale under transform: scale().
+    var progressPx = Math.min(rawPx / currentScale, MAX_LEN);
+    applyState(progressPx);
+  }
+
+  window.addEventListener('load', function () {
+    measure();
+    if (reduceMotion) {
+      applyState(MAX_LEN);
+    } else {
+      update();
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', function () { measure(); update(); });
+    }
+  });
+
+  measure();
+  if (!reduceMotion) update();
+})();
+</script>
+
+</body>
+</html>
