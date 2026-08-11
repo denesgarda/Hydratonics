@@ -110,16 +110,15 @@
   }
   .brand-label[data-lane="hydratonics"] { color: var(--t1-blue); }
 
+  /* position:relative so the checkpoint blocks (position:absolute) inside it
+     anchor correctly; line-track (normal flow) sets this row's height. */
   .diagram-row {
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
+    position: relative;
   }
 
   .line-track {
     position: relative;
-    flex-shrink: 0;
-    height: 320px; /* explicit — absolutely-positioned children don't otherwise contribute to layout height */
+    /* height set in JS — tall enough to cover every checkpoint + trailing run */
   }
   .line {
     position: absolute;
@@ -133,7 +132,7 @@
 
   .mark {
     position: absolute;
-    top: 70px;
+    /* top set per-instance in JS (varies by which checkpoint it dies at) */
     width: 23px;
     height: 23px;
     transform: translate(-11.5px, -11.5px) scale(0);
@@ -158,7 +157,7 @@
 
   .dot {
     position: absolute;
-    top: 90px;
+    /* top set per-instance in JS (a lane can have a dot at several checkpoints) */
     width: 12px;
     height: 12px;
     border-radius: 50%;
@@ -199,7 +198,10 @@
   .fail-text-brand { color: var(--ink); font-weight: 500; }
 
   .checkpoint {
-    padding-top: 79px; /* centers checkpoint-head's line-height:1 row on the dot at top:90px */
+    position: absolute;
+    /* left/top/width set in JS — top centers checkpoint-head's line-height:1
+       row on this checkpoint's dot, left/width follow the same responsive
+       margin logic as everything else on the diagram's right side */
     opacity: 0;
     transition: opacity 0.6s ease;
   }
@@ -258,7 +260,7 @@
         <span class="brand-label" data-lane="hydratonics">Hydratonics</span>
       </div>
 
-      <div class="diagram-row">
+      <div class="diagram-row" id="diagramRow">
         <div class="line-track" id="lineTrack">
           <div class="line" data-lane="liquidiv"></div>
           <div class="line" data-lane="gatorade"></div>
@@ -266,29 +268,9 @@
           <div class="line" data-lane="nuun"></div>
           <div class="line" data-lane="powerade"></div>
           <div class="line" data-lane="hydratonics"></div>
-
-          <div class="mark" data-lane="liquidiv"></div>
-          <div class="mark" data-lane="gatorade"></div>
-
-          <div class="fail-line" data-lane="liquidiv"></div>
-          <div class="fail-text" data-lane="liquidiv"><span class="fail-text-brand">Liquid I.V.</span> — no magnesium in the formula.</div>
-
-          <div class="fail-line" data-lane="gatorade"></div>
-          <div class="fail-text" data-lane="gatorade"><span class="fail-text-brand">Gatorade</span> — no magnesium, no calcium.</div>
-
-          <div class="dot" data-lane="lmnt"></div>
-          <div class="dot" data-lane="nuun"></div>
-          <div class="dot" data-lane="powerade"></div>
-          <div class="dot" data-lane="hydratonics"></div>
+          <!-- marks / dots / fail-lines / fail-texts generated in JS from CHECKPOINTS -->
         </div>
-
-        <div class="checkpoint" id="checkpoint1">
-          <div class="checkpoint-head">
-            <span class="checkpoint-dash">—</span>
-            <span class="checkpoint-title">Real electrolyte panel</span>
-          </div>
-          <p class="checkpoint-desc">Sodium, potassium, and magnesium — not just sodium.</p>
-        </div>
+        <!-- .checkpoint blocks generated in JS from CHECKPOINTS -->
       </div>
 
     </div>
@@ -299,10 +281,77 @@
 <script>
 (function () {
   var LANES = ['liquidiv', 'gatorade', 'lmnt', 'nuun', 'powerade', 'hydratonics'];
-  var CAPS = { liquidiv: 70, gatorade: 70 };
-  var DOT_Y = 90;
-  var MARK_Y = 70;
-  var MAX_LEN = 300;
+
+  // ── Checkpoint data ──────────────────────────────────────────────────────
+  // Each checkpoint is a real formula constraint. `deaths` lists which brands
+  // fail exactly there (verified against public label data — see chat notes).
+  // A lane not listed as dying at or before a checkpoint is still alive there.
+  var CHECKPOINTS = [
+    {
+      title: 'Real electrolyte panel',
+      desc: 'Sodium, potassium, and magnesium — not just sodium.',
+      deaths: [
+        { lane: 'liquidiv', brand: 'Liquid I.V.', reason: 'no magnesium in the formula.' },
+        { lane: 'gatorade', brand: 'Gatorade', reason: 'no magnesium, no calcium.' }
+      ]
+    },
+    {
+      title: 'Glucose for SGLT1 activation',
+      desc: 'Dextrose, included specifically to trigger SGLT1 — not for energy.',
+      deaths: [
+        { lane: 'lmnt', brand: 'LMNT', reason: 'zero sugar, no SGLT1 activation.' }
+      ]
+    },
+    {
+      title: 'Precise 1:1 molar ratio',
+      desc: 'Glucose dosed 1:1 with sodium, capped at 30mmol/L — not guessed.',
+      deaths: [
+        { lane: 'nuun', brand: 'Nuun', reason: 'undershoots the ratio, too dilute.' },
+        { lane: 'powerade', brand: 'Powerade', reason: 'overshoots ~5x, mostly wasted sugar.' }
+      ]
+    }
+  ];
+
+  // Each leader-line has a fixed "reach" (gap + length). Alternating short/long
+  // per checkpoint means two simultaneous deaths stack without their callout
+  // text overlapping (matches the original checkpoint-1 pattern).
+  var REACHES = [14 + 45, 14 + 120];
+  CHECKPOINTS.forEach(function (cp) {
+    cp.deaths.forEach(function (d, i) { d.reach = REACHES[i] || REACHES[REACHES.length - 1]; });
+  });
+
+  // Which checkpoint index (if any) each lane dies at.
+  var DEATH_INDEX = {};
+  CHECKPOINTS.forEach(function (cp, ci) {
+    cp.deaths.forEach(function (d) { DEATH_INDEX[d.lane] = ci; });
+  });
+
+  // Vertical layout: each checkpoint's mark sits MARK_Y0 + i*CHECKPOINT_GAP
+  // down the track, its dot DOT_OFFSET past that. TRAIL is extra scroll run
+  // after the last checkpoint before the terminal length, for the payoff
+  // beat where only the Hydratonics line is still on screen.
+  var MARK_Y0 = 70, CHECKPOINT_GAP = 160, DOT_OFFSET = 20, TRAIL = 160;
+  CHECKPOINTS.forEach(function (cp, ci) {
+    cp.markY = MARK_Y0 + ci * CHECKPOINT_GAP;
+    cp.dotY = cp.markY + DOT_OFFSET;
+  });
+  var MAX_LEN = CHECKPOINTS[CHECKPOINTS.length - 1].dotY + TRAIL;
+
+  // Per-lane cap: the local length where its line permanently stops growing.
+  var CAPS = {};
+  LANES.forEach(function (lane) {
+    var di = DEATH_INDEX[lane];
+    CAPS[lane] = (di === undefined) ? MAX_LEN : CHECKPOINTS[di].markY;
+  });
+
+  // Flat list of every death across every checkpoint, for the responsive
+  // leader-line geometry pass (doesn't care which checkpoint, just markX/reach/markY).
+  var deathSpecs = [];
+  CHECKPOINTS.forEach(function (cp) {
+    cp.deaths.forEach(function (d) {
+      deathSpecs.push({ lane: d.lane, reach: d.reach, markY: cp.markY });
+    });
+  });
 
   var NATURAL_PITCH = 50, MIN_PITCH = 30; // pushed lower than the diagonal callouts would ideally like —
                                            // they may start crowding at the tightest widths
@@ -312,9 +361,45 @@
   var diagramSection = document.getElementById('diagramSection');
   var diagram = document.getElementById('diagram');
   var brandRow = document.getElementById('brandRow');
+  var diagramRow = document.getElementById('diagramRow');
   var lineTrack = document.getElementById('lineTrack');
-  var checkpoint1 = document.getElementById('checkpoint1');
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ── Build the per-checkpoint DOM (marks, dots, fail-lines, fail-texts,
+  // checkpoint text blocks) from the CHECKPOINTS data above. ──────────────
+  function buildDiagram() {
+    var html = '';
+    CHECKPOINTS.forEach(function (cp, ci) {
+      LANES.forEach(function (lane) {
+        var death = cp.deaths.filter(function (d) { return d.lane === lane; })[0];
+        var di = DEATH_INDEX[lane];
+        if (death) {
+          html += '<div class="mark" data-lane="' + lane + '" style="top:' + cp.markY + 'px"></div>';
+          html += '<div class="fail-line" data-lane="' + lane + '" data-reveal-y="' + cp.dotY + '"></div>';
+          html += '<div class="fail-text" data-lane="' + lane + '" data-reveal-y="' + cp.dotY + '">' +
+                    '<span class="fail-text-brand">' + death.brand + '</span> — ' + death.reason +
+                  '</div>';
+        } else if (di === undefined || di > ci) {
+          html += '<div class="dot" data-lane="' + lane + '" data-reveal-y="' + cp.dotY + '" style="top:' + cp.dotY + 'px"></div>';
+        }
+        // else: lane already died at an earlier checkpoint — nothing to render here
+      });
+    });
+    lineTrack.insertAdjacentHTML('beforeend', html);
+
+    CHECKPOINTS.forEach(function (cp) {
+      var block = document.createElement('div');
+      block.className = 'checkpoint';
+      block.innerHTML =
+        '<div class="checkpoint-head"><span class="checkpoint-dash">—</span><span class="checkpoint-title">' + cp.title + '</span></div>' +
+        '<p class="checkpoint-desc">' + cp.desc + '</p>';
+      diagramRow.appendChild(block);
+      cp.el = block;
+    });
+
+    lineTrack.style.height = (MAX_LEN + 40) + 'px';
+  }
+  buildDiagram();
 
   var brandLabels = Array.prototype.slice.call(brandRow.querySelectorAll('.brand-label'));
   var lines = Array.prototype.slice.call(lineTrack.querySelectorAll('.line'));
@@ -334,12 +419,10 @@
     var TEXT_GAP = 5, TEXT_W = 180, FONT_SIZE = 11; // fail-text's base (unshrunk) box width + font size
     var MIN_FONT_SCALE = 0.7; // once the line is fully vertical, this is as far as text alone will shrink
     var BASE_PADDING = 40, MIN_PADDING = 0; // side padding scales down together with diagramScale
-    var specs = [
-      { lane: 'liquidiv', reach: 14 + 45 },
-      { lane: 'gatorade', reach: 14 + 120 }
-    ];
+    var LINE_TRACK_MARGIN = 16, ROW_GAP = 12; // lineTrack's own trailing margin + the old flex gap, now manual
 
     var available, pitch, laneX, diagramMarginLeft, computed, fontScale, diagramScale;
+    diagramScale = 1; // seed for the first iteration's geometry projection, refined below
 
     // Everything the diagram needs — pitch, the leader-line geometry, the
     // font/box shrink, and the last-resort whole-diagram scale. Pulled into
@@ -347,6 +430,20 @@
     // (diagramScale) and feeds into it (via available width), so it has to
     // run more than once per layout pass.
     function solve() {
+      // diagram.style.transform scales the WHOLE diagram around laneX[5], so
+      // a local point's true on-screen position is diagramMarginLeft +
+      // laneX[5] + diagramScale*(x - laneX[5]) — NOT diagramMarginLeft + x,
+      // which is only correct when diagramScale is exactly 1. Once anything
+      // pushes diagramScale below 1, that naive formula understates how much
+      // room every OTHER callout actually has on screen (the scale pulls
+      // everything toward the anchor), which was causing lines to steepen
+      // that didn't need to. Project through the transform using last
+      // iteration's diagramScale — refines to the correct value over the
+      // padding fixed-point loop below, same trick as padding itself.
+      var scaleForGeometry = diagramScale;
+      function screenX(x) { return diagramMarginLeft + laneX[5] + scaleForGeometry * (x - laneX[5]); }
+      function localXFromScreen(sx) { return laneX[5] + (sx - diagramMarginLeft - laneX[5]) / scaleForGeometry; }
+
       available = diagramSection.clientWidth - padding * 2;
       pitch = clamp((available - 16 - 12 - CHECKPOINT_MIN - LABEL_OVERFLOW) / (CALLOUT_RATIO + 5), MIN_PITCH, NATURAL_PITCH);
       var calloutZone = pitch * CALLOUT_RATIO;
@@ -358,44 +455,57 @@
       diagramMarginLeft = available / 2 - laneX[5];
 
       // Diagonal leader lines. Each has a fixed "reach" (gap + length) and a
-      // fixed vertical drop derived from it at the natural 45°, so the two
-      // callouts keep their stacked spacing no matter what. Normally they sit
-      // at 45°. But once the natural endpoint would drift within SAFE_MARGIN
-      // of the screen edge, the endpoint's X gets pinned there instead, and
-      // the line steepens — up to fully vertical — to keep reaching it as the
-      // mark itself keeps moving left with the shrinking pitch. If even that
-      // (plus the floor font size) isn't enough, diagramScale picks up the rest.
+      // fixed vertical drop derived from it at the natural 45°, so callouts
+      // sharing a checkpoint keep their stacked spacing no matter what.
+      // Priority order, cheapest fix first: try shrinking the font at the
+      // natural 45° angle before ever steepening it — steepening should only
+      // happen for a callout that genuinely doesn't fit even at the smallest
+      // font size, not just because the full-size text doesn't fit.
       computed = [];
       fontScale = 1;
       diagramScale = 1;
-      specs.forEach(function (spec) {
+
+      // Pass 1: the shared font scale, from each callout's own natural-45°
+      // fit requirement (not the fully-vertical worst case).
+      deathSpecs.forEach(function (spec) {
         var markX = laneX[LANES.indexOf(spec.lane)];
         var yDrop = spec.reach * Math.SQRT1_2; // == reach * sin(45deg) == reach * cos(45deg)
-
         var naturalX = markX - yDrop;
-        var onscreenNaturalTextLeft = diagramMarginLeft + naturalX - TEXT_GAP - TEXT_W;
+        var availableWAt45 = screenX(naturalX) - TEXT_GAP - SAFE_MARGIN;
+        fontScale = Math.min(fontScale, clamp(availableWAt45 / TEXT_W, MIN_FONT_SCALE, 1));
+      });
+
+      // Pass 2: using that shared (possibly already-shrunk) text width, only
+      // steepen — or as a last resort, hand off to diagramScale — for the
+      // callout(s) it genuinely still isn't enough for.
+      var scaledTextWForAngle = TEXT_W * fontScale;
+      deathSpecs.forEach(function (spec) {
+        var markX = laneX[LANES.indexOf(spec.lane)];
+        var yDrop = spec.reach * Math.SQRT1_2;
+        var naturalX = markX - yDrop;
+
+        var onscreenNaturalTextLeft = screenX(naturalX) - TEXT_GAP - scaledTextWForAngle;
         var targetX = onscreenNaturalTextLeft < SAFE_MARGIN
-          ? (SAFE_MARGIN + TEXT_GAP + TEXT_W - diagramMarginLeft)
+          ? localXFromScreen(SAFE_MARGIN + TEXT_GAP + scaledTextWForAngle)
           : naturalX;
 
         var dx = clamp(markX - targetX, 0, yDrop); // 0 = vertical, yDrop = the natural 45° case
         var dy = yDrop;
 
-        var availableW = diagramMarginLeft + markX - TEXT_GAP - SAFE_MARGIN; // width budget, fully vertical
-        var rawFontRatio = availableW / TEXT_W;
-        fontScale = Math.min(fontScale, clamp(rawFontRatio, MIN_FONT_SCALE, 1));
-
-        if (rawFontRatio < MIN_FONT_SCALE) {
-          // Even the floor font size overflows — find the scale that would pull
-          // the floor-sized text box back to the safe margin, measured as a
-          // reach from the Hydratonics anchor (laneX[5]), since that's the
-          // point the whole diagram scales around.
-          var neededReach = (laneX[5] - markX) + TEXT_GAP + TEXT_W * MIN_FONT_SCALE;
+        // This one solves for diagramScale directly (algebraically exact,
+        // not an approximation), so it doesn't need the screenX() projection.
+        var availableWAtVertical = diagramMarginLeft + markX - TEXT_GAP - SAFE_MARGIN; // widest possible budget, at scale 1
+        if (availableWAtVertical < scaledTextWForAngle) {
+          // Even fully vertical overflows — find the scale that would pull
+          // the text box back to the safe margin, measured as a reach from
+          // the Hydratonics anchor (laneX[5]), since that's the point the
+          // whole diagram scales around.
+          var neededReach = (laneX[5] - markX) + TEXT_GAP + scaledTextWForAngle;
           var candidateScale = (available / 2 - SAFE_MARGIN) / neededReach;
           diagramScale = Math.min(diagramScale, candidateScale);
         }
 
-        computed.push({ spec: spec, markX: markX, dx: dx, dy: dy });
+        computed.push({ spec: spec, markX: markX, dx: dx, dy: dy, markY: spec.markY });
       });
       diagramScale = Math.max(diagramScale, 0.001); // numerical safety only, not a design floor
     }
@@ -426,14 +536,17 @@
     // checkpoint text doesn't get a say in that. Instead, once the left side is
     // settled, give the checkpoint text whatever room is left up to the same
     // safe margin on the right, and let it wrap there rather than at a fixed
-    // width. 28 = 16 (lineTrack's own trailing margin) + 12 (flex gap) between
-    // lineTrack and checkpoint.
-    // Constrain the whole .checkpoint block, not just the description — the
-    // title row (dash + "Real electrolyte panel" at 22px) can otherwise be
-    // wider than the description needs and become the thing that actually
-    // pokes past the margin, since it's what determines checkpoint's rendered width.
-    var checkpointMaxWidth = (available / 2 - SAFE_MARGIN) / diagramScale - 28;
-    checkpoint1.style.width = clamp(checkpointMaxWidth, 80, 440) + 'px';
+    // width. Constrain the whole .checkpoint block, not just the description —
+    // the title row can otherwise be wider than the description needs and
+    // become the thing that actually pokes past the margin.
+    var checkpointLeft = laneX[5] + LINE_TRACK_MARGIN + ROW_GAP;
+    var checkpointMaxWidth = (available / 2 - SAFE_MARGIN) / diagramScale - (LINE_TRACK_MARGIN + ROW_GAP);
+    var checkpointWidth = clamp(checkpointMaxWidth, 80, 440);
+    CHECKPOINTS.forEach(function (cp) {
+      cp.el.style.left = checkpointLeft + 'px';
+      cp.el.style.top = (cp.dotY - 11) + 'px'; // centers checkpoint-head's line-height:1 row on the dot
+      cp.el.style.width = checkpointWidth + 'px';
+    });
 
     // Apply the leader-line geometry + the shared font/box shrink. Shrinking
     // the box width moves its LEFT edge inward while its right edge (anchored
@@ -442,12 +555,12 @@
     var scaledTextW = TEXT_W * fontScale;
     var scaledFontSize = FONT_SIZE * fontScale;
     computed.forEach(function (c) {
-      var markX = c.markX, dx = c.dx, dy = c.dy;
-      var p2x = markX - dx, p2y = MARK_Y + dy;
+      var markX = c.markX, dx = c.dx, dy = c.dy, markY = c.markY;
+      var p2x = markX - dx, p2y = markY + dy;
       var angleDeg = Math.atan2(dy, -dx) * 180 / Math.PI; // 135 = the old fixed 45°-down-left, 90 = vertical
 
       var segLen = Math.sqrt(dx * dx + dy * dy);
-      var p1x = markX - GAP * (dx / segLen), p1y = MARK_Y + GAP * (dy / segLen);
+      var p1x = markX - GAP * (dx / segLen), p1y = markY + GAP * (dy / segLen);
       var lineLen = segLen - GAP;
 
       var lineEl = failLines.filter(function (e) { return e.getAttribute('data-lane') === c.spec.lane; })[0];
@@ -473,17 +586,16 @@
   function applyState(progressPx) {
     lines.forEach(function (line) {
       var lane = line.getAttribute('data-lane');
-      var cap = CAPS.hasOwnProperty(lane) ? CAPS[lane] : MAX_LEN;
-      line.style.height = Math.min(progressPx, cap) + 'px';
+      line.style.height = Math.min(progressPx, CAPS[lane]) + 'px';
     });
     marks.forEach(function (mark) {
       var lane = mark.getAttribute('data-lane');
       mark.classList.toggle('is-visible', progressPx >= CAPS[lane]);
     });
-    dots.forEach(function (dot) { dot.classList.toggle('is-visible', progressPx >= DOT_Y); });
-    failLines.forEach(function (el) { el.classList.toggle('is-visible', progressPx >= DOT_Y); });
-    failTexts.forEach(function (el) { el.classList.toggle('is-visible', progressPx >= DOT_Y); });
-    checkpoint1.classList.toggle('is-visible', progressPx >= DOT_Y);
+    dots.forEach(function (dot) { dot.classList.toggle('is-visible', progressPx >= +dot.dataset.revealY); });
+    failLines.forEach(function (el) { el.classList.toggle('is-visible', progressPx >= +el.dataset.revealY); });
+    failTexts.forEach(function (el) { el.classList.toggle('is-visible', progressPx >= +el.dataset.revealY); });
+    CHECKPOINTS.forEach(function (cp) { cp.el.classList.toggle('is-visible', progressPx >= cp.dotY); });
   }
 
   var ticking = false;
