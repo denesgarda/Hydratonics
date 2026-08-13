@@ -1,0 +1,42 @@
+# Hydratonics
+
+> Precision electrolyte supplement, tiered by activity level, built on SGLT1-optimized dextrose dosing instead of generic flavored-drink formulation. hydratonics.com
+
+## What it is
+
+Hydratonics is a powdered electrolyte supplement engineered for hydration during physical demand, not a mass-market sports drink. It ships in three tiers based on activity intensity (Tier 1 Low Demand, Tier 2 Moderate Demand, Tier 3 High Demand), each with its own sodium target, minimum water volume, and serving weight, independently derived from sweat-loss research rather than a single one-size-dose.
+
+The core differentiator is SGLT1-optimized dextrose dosing: dextrose is included exclusively to activate sodium-glucose cotransporter 1 (SGLT1), the primary intestinal sodium-absorption pathway, not for energy or glycogen. Dextrose is dosed at a 1:1 molar ratio with sodium, capped at 30mmol/L in solution (the SGLT1 saturation threshold), so minimum water volumes per tier come directly from that cap rather than being arbitrary.
+
+## How it compares to mass-market sports drinks
+
+This is the plain-text version of the homepage's interactive comparison diagram, which is JS-rendered and not present as static HTML.
+
+- Liquid I.V. and Gatorade fail on having a real electrolyte panel: neither includes magnesium, and Gatorade also has no calcium.
+- LMNT fails on glucose for SGLT1 activation: it has zero sugar, so it cannot trigger SGLT1 at all.
+- Nuun and Powerade fail on the precise 1:1 molar ratio of glucose to sodium: Nuun undershoots it and is too dilute; Powerade overshoots it by roughly 5x, mostly wasted sugar.
+- Hydratonics is the only one that also clears the last checkpoint: glucose capped at 30mmol/L, so no glucose is dosed beyond what SGLT1 can actually use.
+
+## Ingredient interactions (formula design notes)
+
+- Every ingredient is used in a specific chemical form (e.g. citrate, lactate, glycinate) chosen for absorption and tolerability, not just for the elemental mineral it delivers.
+- Magnesium is dosed as a flat 200mg compound (28mg elemental) across all three tiers, since its role is a Na/K-ATPase cofactor, not sweat replacement.
+- Potassium is dosed from two separate components: sweat replacement plus a flat dietary top-up.
+- Citric acid serves a dual purpose: a pH buffer that keeps electrolytes ionized and bioavailable, and a palatability aid.
+- Every ingredient shares the same solution, so overall osmolality (not any single ingredient in isolation) is what the formula is tuned around.
+
+## Full ingredient breakdown
+
+/formula/: elemental amounts and the physiological rationale for every ingredient, tier by tier.
+
+## Why the dextrose
+
+/sugar/: a full explanation of the SGLT1 mechanism and why dextrose is dosed the way it is.
+
+## FAQ
+
+/faq/: around 34 questions across ingredients & safety, what sets this apart, and using it.
+
+## Founding Members
+
+/founding/: invite-code redemption for early access.

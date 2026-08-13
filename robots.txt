@@ -1,0 +1,26 @@
+User-agent: *
+Allow: /
+Disallow: /landing/
+Disallow: /compare/
+
+# No dedicated blocks for individual AI crawlers (GPTBot, ClaudeBot,
+# anthropic-ai, Claude-User, Claude-SearchBot, PerplexityBot,
+# Perplexity-User, OAI-SearchBot, ChatGPT-User, Google-Extended, etc.) —
+# a bot with its own named User-agent block only follows the rules in
+# that block, not the wildcard block above, so giving each one its own
+# "Allow: /"-only block would have made them ignore the Disallow lines
+# above. The wildcard block covers everyone, training and retrieval bots
+# included: Hydratonics is a brand-new domain, and the goal right now is
+# inclusion in AI systems' knowledge, not opting out of it.
+
+# A/B landing-page variants are near-duplicates of the homepage, kept out
+# of the index to avoid duplicate-content dilution.
+# /compare/ is built but intentionally not available right now (owner's
+# call) — fully de-referenced: not linked anywhere, not in sitemap.xml,
+# not in llms.txt, and disallowed here.
+
+# Plain-text product summary for AI agents/crawlers (no official robots.txt
+# directive for this yet, noted here for discoverability):
+# https://hydratonics.com/llms.txt
+
+Sitemap: https://hydratonics.com/sitemap.xml
